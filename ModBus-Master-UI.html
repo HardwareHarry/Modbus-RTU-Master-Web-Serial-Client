@@ -22,6 +22,7 @@
     --accent-amber: #f59e0b;
     --accent-red: #ef4444;
     --accent-cyan: #06b6d4;
+    --accent-purple: #a78bfa;
     --glow-blue: rgba(59, 130, 246, 0.15);
     --glow-green: rgba(16, 185, 129, 0.15);
     --glow-red: rgba(239, 68, 68, 0.15);
@@ -37,7 +38,6 @@
     overflow-x: hidden;
   }
 
-  /* Subtle grid background */
   body::before {
     content: '';
     position: fixed;
@@ -52,22 +52,14 @@
 
   .app { position: relative; z-index: 1; }
 
-  /* Header */
   .header {
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
     padding: 16px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
   }
 
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
 
   .logo {
     width: 38px; height: 38px;
@@ -79,437 +71,261 @@
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
   }
 
-  .header h1 {
-    font-size: 20px; font-weight: 600;
-    letter-spacing: -0.02em;
-  }
-
+  .header h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
   .header h1 span { color: var(--text-muted); font-weight: 400; }
 
   .connection-status {
     display: flex; align-items: center; gap: 8px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px; color: var(--text-secondary);
-    background: var(--bg-card);
-    padding: 8px 14px; border-radius: 8px;
+    background: var(--bg-card); padding: 8px 14px; border-radius: 8px;
     border: 1px solid var(--border);
   }
 
   .status-dot {
     width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent-red);
-    box-shadow: 0 0 8px var(--accent-red);
+    background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red);
     transition: all 0.3s;
   }
 
-  .status-dot.connected {
-    background: var(--accent-green);
-    box-shadow: 0 0 8px var(--accent-green);
-  }
+  .status-dot.connected { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
 
-  /* Main Layout */
   .main {
-    display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: 0;
-    min-height: calc(100vh - 71px);
+    display: grid; grid-template-columns: 340px 1fr;
+    gap: 0; min-height: calc(100vh - 71px);
   }
 
-  /* Sidebar */
   .sidebar {
-    background: var(--bg-secondary);
-    border-right: 1px solid var(--border);
-    padding: 24px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    background: var(--bg-secondary); border-right: 1px solid var(--border);
+    padding: 24px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 20px;
   }
 
   .card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    transition: border-color 0.2s;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; transition: border-color 0.2s;
   }
 
   .card:hover { border-color: rgba(59, 130, 246, 0.3); }
 
   .card-title {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
   }
 
   .card-title svg { width: 14px; height: 14px; opacity: 0.6; }
 
-  /* Form Elements */
-  .form-group {
-    margin-bottom: 12px;
-  }
-
+  .form-group { margin-bottom: 12px; }
   .form-group:last-child { margin-bottom: 0; }
 
   label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    margin-bottom: 5px;
+    display: block; font-size: 12px; font-weight: 500;
+    color: var(--text-secondary); margin-bottom: 5px;
   }
 
   input, select {
-    width: 100%;
-    padding: 9px 12px;
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text-primary);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%; padding: 9px 12px;
+    background: var(--bg-input); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text-primary);
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
   }
 
-  input:focus, select:focus {
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 0 3px var(--glow-blue);
-  }
+  input:focus, select:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px var(--glow-blue); }
 
   select { cursor: pointer; }
   select option { background: var(--bg-secondary); }
 
-  .row-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-  /* Buttons */
   .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-family: 'Outfit', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
-    width: 100%;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 10px 18px; border-radius: 8px;
+    font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none; transition: all 0.2s; width: 100%;
   }
 
   .btn svg { width: 16px; height: 16px; }
 
   .btn-primary {
     background: linear-gradient(135deg, var(--accent-blue), #2563eb);
-    color: #fff;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    color: #fff; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
   }
 
-  .btn-primary:hover {
-    box-shadow: 0 6px 25px rgba(59, 130, 246, 0.45);
-    transform: translateY(-1px);
-  }
-
+  .btn-primary:hover { box-shadow: 0 6px 25px rgba(59, 130, 246, 0.45); transform: translateY(-1px); }
   .btn-primary:active { transform: translateY(0); }
 
-  .btn-secondary {
-    background: var(--bg-input);
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
-  }
+  .btn-secondary { background: var(--bg-input); color: var(--text-secondary); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--bg-card); color: var(--text-primary); }
 
-  .btn-secondary:hover {
-    background: var(--bg-card);
-    color: var(--text-primary);
-  }
+  .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.2); }
+  .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
 
-  .btn-danger {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--accent-red);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-  }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
 
-  .btn-danger:hover {
-    background: rgba(239, 68, 68, 0.2);
-  }
+  .content { padding: 24px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
 
-  .btn-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 6px;
-  }
-
-  /* Content Area */
-  .content {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    overflow-y: auto;
-  }
-
-  /* Function Code Selector Tabs */
   .fc-tabs {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    padding: 4px;
-    background: var(--bg-secondary);
-    border-radius: 12px;
-    border: 1px solid var(--border);
+    display: flex; gap: 6px; flex-wrap: wrap; padding: 4px;
+    background: var(--bg-secondary); border-radius: 12px; border: 1px solid var(--border);
   }
 
   .fc-tab {
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    font-family: 'JetBrains Mono', monospace;
-    transition: all 0.2s;
-    white-space: nowrap;
+    padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 500;
+    cursor: pointer; border: none; background: transparent;
+    color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
+    transition: all 0.2s; white-space: nowrap;
   }
 
   .fc-tab:hover { color: var(--text-secondary); background: var(--bg-card); }
 
-  .fc-tab.active {
-    background: var(--accent-blue);
-    color: #fff;
-    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
-  }
+  .fc-tab.active { background: var(--accent-blue); color: #fff; box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3); }
+  .fc-tab.write.active { background: var(--accent-amber); box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3); }
 
-  .fc-tab.write.active {
-    background: var(--accent-amber);
-    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
-  }
+  .query-panel { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
 
-  /* Query Panel */
-  .query-panel {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-  }
-
-  .query-panel .panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-  }
-
-  .query-panel h3 {
-    font-size: 15px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .query-panel .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .query-panel h3 { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 
   .fc-badge {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 6px;
-    background: var(--glow-blue);
-    color: var(--accent-blue);
-    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    padding: 3px 8px; border-radius: 6px;
+    background: var(--glow-blue); color: var(--accent-blue); font-weight: 600;
   }
 
-  .fc-badge.write {
-    background: rgba(245, 158, 11, 0.15);
-    color: var(--accent-amber);
-  }
-
-  .query-fields {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
-    margin-bottom: 16px;
-  }
+  .fc-badge.write { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
 
   .write-value-group {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px;
-    margin-bottom: 16px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px; margin-bottom: 16px;
   }
 
-  .write-value-group h4 {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--accent-amber);
-    margin-bottom: 10px;
+  .write-value-group h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-amber); margin-bottom: 10px; }
+
+  .send-btn-row { display: flex; gap: 8px; }
+
+  /* Wire address preview */
+  .wire-addr-preview {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--accent-cyan);
+    background: rgba(6, 182, 212, 0.08);
+    border: 1px solid rgba(6, 182, 212, 0.15);
+    border-radius: 6px; padding: 6px 10px;
+    margin-top: 8px; display: none; line-height: 1.5;
   }
 
-  .send-btn-row {
-    display: flex; gap: 8px;
+  .wire-addr-preview.visible { display: block; }
+
+  /* Output Format Toggle Bar */
+  .output-format-bar { display: none; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .output-format-bar .format-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-right: 4px; }
+
+  .format-toggle { display: flex; gap: 2px; padding: 3px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border); }
+
+  .format-btn {
+    padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600;
+    cursor: pointer; border: none; background: transparent;
+    color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
+    transition: all 0.2s; white-space: nowrap;
   }
 
-  /* Response Area */
-  .response-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  .format-btn:hover { color: var(--text-secondary); }
+
+  .format-btn.active { background: var(--accent-purple); color: #fff; box-shadow: 0 2px 8px rgba(167, 139, 250, 0.3); }
+
+  .offset-indicator {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--accent-cyan); background: rgba(6, 182, 212, 0.1);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    padding: 4px 10px; border-radius: 6px; display: none; align-items: center; gap: 4px;
   }
 
-  .response-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+  .offset-indicator.visible { display: inline-flex; }
 
-  .response-header h3 {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-secondary);
-  }
+  .response-area { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+
+  .response-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .response-header h3 { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
 
   .response-meta {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--text-muted);
-    display: flex;
-    gap: 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-muted); display: flex; gap: 16px;
   }
 
   .response-meta span { display: flex; align-items: center; gap: 4px; }
 
   .response-table-wrap {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    flex: 1;
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; flex: 1;
   }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-  }
-
-  thead {
-    background: var(--bg-card);
-  }
+  table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+  thead { background: var(--bg-card); }
 
   th {
-    text-align: left;
-    padding: 10px 16px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
+    text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); border-bottom: 1px solid var(--border);
   }
 
-  td {
-    padding: 9px 16px;
-    border-bottom: 1px solid rgba(42, 58, 82, 0.4);
-    color: var(--text-secondary);
-  }
-
+  td { padding: 9px 16px; border-bottom: 1px solid rgba(42, 58, 82, 0.4); color: var(--text-secondary); }
   tr:hover td { background: rgba(59, 130, 246, 0.04); }
 
   td.addr { color: var(--accent-cyan); }
   td.val { color: var(--text-primary); font-weight: 500; }
   td.hex { color: var(--accent-amber); }
   td.bin { color: var(--text-muted); font-size: 11px; }
+  td.ascii { color: var(--accent-purple); font-weight: 500; }
   td.bool-true { color: var(--accent-green); font-weight: 600; }
   td.bool-false { color: var(--accent-red); }
 
   .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    color: var(--text-muted);
-    text-align: center;
-    gap: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 60px 20px; color: var(--text-muted); text-align: center; gap: 12px;
   }
 
   .empty-state svg { width: 48px; height: 48px; opacity: 0.3; }
   .empty-state p { font-size: 14px; }
   .empty-state small { font-size: 12px; opacity: 0.6; }
 
-  /* Log Panel */
-  .log-panel {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
+  /* Raw Frame Panel */
+  .raw-frame-panel {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    display: none; line-height: 1.7;
   }
+
+  .raw-frame-panel .raw-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; }
+  .raw-row { display: flex; gap: 8px; margin-bottom: 2px; }
+  .raw-tag { color: var(--text-muted); min-width: 46px; font-weight: 600; }
+  .raw-hex-data { color: var(--accent-amber); word-break: break-all; }
+  .raw-bin-data { color: var(--text-muted); word-break: break-all; font-size: 10px; }
+  .raw-ascii-data { color: var(--accent-purple); word-break: break-all; }
+
+  /* Log Panel */
+  .log-panel { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
 
   .log-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-    user-select: none;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    cursor: pointer; user-select: none;
   }
 
-  .log-header h3 {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .log-header h3 { font-size: 13px; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
 
-  .log-count {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    padding: 2px 7px;
-    border-radius: 10px;
-    background: var(--glow-blue);
-    color: var(--accent-blue);
-  }
+  .log-count { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 7px; border-radius: 10px; background: var(--glow-blue); color: var(--accent-blue); }
 
   .log-body {
-    max-height: 200px;
-    overflow-y: auto;
-    padding: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    line-height: 1.7;
+    max-height: 200px; overflow-y: auto; padding: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.7;
   }
 
   .log-body.collapsed { display: none; }
 
-  .log-entry {
-    padding: 2px 8px;
-    border-radius: 4px;
-    display: flex;
-    gap: 10px;
-  }
-
+  .log-entry { padding: 2px 8px; border-radius: 4px; display: flex; gap: 10px; }
   .log-entry:hover { background: var(--bg-card); }
-
   .log-time { color: var(--text-muted); white-space: nowrap; }
   .log-dir { font-weight: 600; width: 22px; }
   .log-dir.tx { color: var(--accent-blue); }
@@ -517,41 +333,32 @@
   .log-dir.err { color: var(--accent-red); }
   .log-msg { color: var(--text-secondary); word-break: break-all; }
 
-  /* Animations */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   .fade-in { animation: fadeIn 0.3s ease-out; }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
   .sending .status-dot { animation: pulse 0.6s infinite; background: var(--accent-blue); }
 
-  /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-  /* Web Serial API note */
   .api-note {
-    font-size: 11px;
-    color: var(--text-muted);
-    background: rgba(245, 158, 11, 0.06);
-    border: 1px solid rgba(245, 158, 11, 0.15);
-    border-radius: 8px;
-    padding: 10px 14px;
-    line-height: 1.5;
+    font-size: 11px; color: var(--text-muted);
+    background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.15);
+    border-radius: 8px; padding: 10px 14px; line-height: 1.5;
   }
 
   .api-note strong { color: var(--accent-amber); }
 
-  /* Responsive */
+  .toggle-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .toggle-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent-cyan); cursor: pointer; }
+  .toggle-row label { margin: 0; font-size: 12px; font-weight: 500; color: var(--text-secondary); cursor: pointer; }
+
+  .offset-hint { font-size: 10px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
+  .offset-hint b { color: var(--accent-cyan); }
+
   @media (max-width: 900px) {
     .main { grid-template-columns: 1fr; }
     .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
@@ -560,7 +367,6 @@
 </head>
 <body>
 <div class="app">
-  <!-- Header -->
   <div class="header">
     <div class="header-left">
       <div class="logo">MB</div>
@@ -573,7 +379,6 @@
   </div>
 
   <div class="main">
-    <!-- Sidebar -->
     <div class="sidebar">
       <!-- Serial Port Config -->
       <div class="card">
@@ -649,12 +454,35 @@
           </div>
           <div class="form-group">
             <label>Start Address</label>
-            <input type="number" id="startAddr" value="0" min="0" max="65535">
+            <input type="number" id="startAddr" value="0" min="0" max="65535" oninput="updateWirePreview()">
           </div>
         </div>
         <div class="form-group">
           <label>Quantity</label>
           <input type="number" id="quantity" value="10" min="1" max="125">
+        </div>
+        <div class="wire-addr-preview" id="wireAddrPreview"></div>
+      </div>
+
+      <!-- Minus Offset -->
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><circle cx="12" cy="12" r="10"/></svg>
+          Minus Offset
+        </div>
+        <div class="toggle-row">
+          <input type="checkbox" id="minusOffsetEnabled" onchange="updateOffsetUI()">
+          <label for="minusOffsetEnabled">Enable Minus Offset</label>
+        </div>
+        <div class="form-group">
+          <label>Offset Value</label>
+          <input type="number" id="minusOffset" value="0" min="0" max="65535" oninput="updateOffsetUI()">
+        </div>
+        <div class="offset-hint">
+          Subtracts from the start address before sending on the wire.<br>
+          e.g. Start Addr <b>10001</b>, Offset <b>10001</b> → Wire Addr <b>0</b><br>
+          e.g. Start Addr <b>40001</b>, Offset <b>40001</b> → Wire Addr <b>0</b><br>
+          The <em>display</em> still shows your original address.
         </div>
       </div>
 
@@ -679,13 +507,12 @@
 
       <div class="api-note">
         <strong>⚡ Web Serial API</strong><br>
-        Requires Chrome/Edge 89+. Click <strong>Connect</strong> to select your serial port. The browser will prompt for device access.
+        Requires Chrome/Edge 89+. Click <strong>Connect</strong> to select your serial port.
       </div>
     </div>
 
     <!-- Content -->
     <div class="content">
-      <!-- Function Code Tabs -->
       <div class="fc-tabs">
         <button class="fc-tab active" onclick="setFC(1, this)">FC01 Read Coils</button>
         <button class="fc-tab" onclick="setFC(2, this)">FC02 Read Discrete</button>
@@ -697,7 +524,6 @@
         <button class="fc-tab write" onclick="setFC(16, this)">FC16 Write Registers</button>
       </div>
 
-      <!-- Query Panel -->
       <div class="query-panel">
         <div class="panel-header">
           <h3>
@@ -706,7 +532,6 @@
           </h3>
         </div>
 
-        <!-- Write Value Fields (hidden by default) -->
         <div class="write-value-group" id="writeGroup" style="display:none;">
           <h4>Write Value(s)</h4>
           <div class="form-group">
@@ -732,6 +557,20 @@
             <span>⏱ <span id="respTime">--</span>ms</span>
             <span>📦 <span id="respBytes">--</span> bytes</span>
             <span>Slave <span id="respSlave">--</span></span>
+            <span class="offset-indicator" id="offsetIndicator">Offset: <span id="offsetDisplay">0</span></span>
+          </div>
+        </div>
+
+        <!-- Output Format Toggle Bar -->
+        <div class="output-format-bar" id="outputFormatBar">
+          <span class="format-label">Show:</span>
+          <div class="format-toggle">
+            <button class="format-btn active" onclick="toggleFormat('decimal', this)">DEC</button>
+            <button class="format-btn active" onclick="toggleFormat('hex', this)">HEX</button>
+            <button class="format-btn" onclick="toggleFormat('binary', this)">BIN</button>
+            <button class="format-btn" onclick="toggleFormat('signed', this)">SIGNED</button>
+            <button class="format-btn" onclick="toggleFormat('ascii', this)">ASCII</button>
+            <button class="format-btn" onclick="toggleFormat('float32', this)">FLOAT32</button>
           </div>
         </div>
 
@@ -745,6 +584,14 @@
             <thead id="tableHead"></thead>
             <tbody id="tableBody"></tbody>
           </table>
+        </div>
+
+        <!-- Raw Frame Display -->
+        <div class="raw-frame-panel" id="rawFramePanel">
+          <div class="raw-label">Raw Response Frame</div>
+          <div class="raw-row"><span class="raw-tag">HEX</span><span class="raw-hex-data" id="rawHex"></span></div>
+          <div class="raw-row"><span class="raw-tag">BIN</span><span class="raw-bin-data" id="rawBin"></span></div>
+          <div class="raw-row"><span class="raw-tag">ASCII</span><span class="raw-ascii-data" id="rawAscii"></span></div>
         </div>
       </div>
 
@@ -776,6 +623,15 @@
   let logEntries = 0;
   let logCollapsed = false;
 
+  // Output format column visibility
+  let outputFormats = {
+    decimal: true, hex: true, binary: false,
+    signed: false, ascii: false, float32: false,
+  };
+
+  // Cache last response for re-render on format change
+  let lastResponse = null;
+
   // ─── CRC16 Modbus ──────────────────────────────────────
   function crc16(buffer) {
     let crc = 0xFFFF;
@@ -805,48 +661,85 @@
     return crc16(payload) === received;
   }
 
+  // ─── Minus Offset ──────────────────────────────────────
+  // Returns the wire address = startAddr - offset (when enabled)
+  function getWireAddress(startAddr) {
+    const enabled = document.getElementById('minusOffsetEnabled').checked;
+    if (!enabled) return startAddr;
+    const offset = parseInt(document.getElementById('minusOffset').value) || 0;
+    const wire = startAddr - offset;
+    return Math.max(0, Math.min(65535, wire));
+  }
+
+  function updateOffsetUI() {
+    const enabled = document.getElementById('minusOffsetEnabled').checked;
+    const offset = parseInt(document.getElementById('minusOffset').value) || 0;
+    const indicator = document.getElementById('offsetIndicator');
+    const display = document.getElementById('offsetDisplay');
+    if (enabled && offset !== 0) {
+      indicator.classList.add('visible');
+      display.textContent = '−' + offset;
+    } else {
+      indicator.classList.remove('visible');
+    }
+    updateWirePreview();
+  }
+
+  function updateWirePreview() {
+    const enabled = document.getElementById('minusOffsetEnabled').checked;
+    const preview = document.getElementById('wireAddrPreview');
+    if (!enabled) {
+      preview.classList.remove('visible');
+      return;
+    }
+    const startAddr = parseInt(document.getElementById('startAddr').value) || 0;
+    const wireAddr = getWireAddress(startAddr);
+    preview.classList.add('visible');
+    preview.innerHTML = `Display: <b>${startAddr}</b> → Wire: <b>${wireAddr}</b> (0x${wireAddr.toString(16).toUpperCase().padStart(4, '0')})`;
+  }
+
   // ─── Frame Builders ────────────────────────────────────
-  function buildReadFrame(slaveId, fc, startAddr, quantity) {
+  function buildReadFrame(slaveId, fc, wireAddr, quantity) {
     const frame = new Uint8Array(6);
     frame[0] = slaveId;
     frame[1] = fc;
-    frame[2] = (startAddr >> 8) & 0xFF;
-    frame[3] = startAddr & 0xFF;
+    frame[2] = (wireAddr >> 8) & 0xFF;
+    frame[3] = wireAddr & 0xFF;
     frame[4] = (quantity >> 8) & 0xFF;
     frame[5] = quantity & 0xFF;
     return appendCRC(frame);
   }
 
-  function buildWriteSingleCoilFrame(slaveId, addr, value) {
+  function buildWriteSingleCoilFrame(slaveId, wireAddr, value) {
     const frame = new Uint8Array(6);
     frame[0] = slaveId;
     frame[1] = 5;
-    frame[2] = (addr >> 8) & 0xFF;
-    frame[3] = addr & 0xFF;
+    frame[2] = (wireAddr >> 8) & 0xFF;
+    frame[3] = wireAddr & 0xFF;
     frame[4] = value ? 0xFF : 0x00;
     frame[5] = 0x00;
     return appendCRC(frame);
   }
 
-  function buildWriteSingleRegFrame(slaveId, addr, value) {
+  function buildWriteSingleRegFrame(slaveId, wireAddr, value) {
     const frame = new Uint8Array(6);
     frame[0] = slaveId;
     frame[1] = 6;
-    frame[2] = (addr >> 8) & 0xFF;
-    frame[3] = addr & 0xFF;
+    frame[2] = (wireAddr >> 8) & 0xFF;
+    frame[3] = wireAddr & 0xFF;
     frame[4] = (value >> 8) & 0xFF;
     frame[5] = value & 0xFF;
     return appendCRC(frame);
   }
 
-  function buildWriteMultipleCoilsFrame(slaveId, startAddr, values) {
+  function buildWriteMultipleCoilsFrame(slaveId, wireAddr, values) {
     const qty = values.length;
     const byteCount = Math.ceil(qty / 8);
     const frame = new Uint8Array(7 + byteCount);
     frame[0] = slaveId;
     frame[1] = 15;
-    frame[2] = (startAddr >> 8) & 0xFF;
-    frame[3] = startAddr & 0xFF;
+    frame[2] = (wireAddr >> 8) & 0xFF;
+    frame[3] = wireAddr & 0xFF;
     frame[4] = (qty >> 8) & 0xFF;
     frame[5] = qty & 0xFF;
     frame[6] = byteCount;
@@ -856,14 +749,14 @@
     return appendCRC(frame);
   }
 
-  function buildWriteMultipleRegsFrame(slaveId, startAddr, values) {
+  function buildWriteMultipleRegsFrame(slaveId, wireAddr, values) {
     const qty = values.length;
     const byteCount = qty * 2;
     const frame = new Uint8Array(7 + byteCount);
     frame[0] = slaveId;
     frame[1] = 16;
-    frame[2] = (startAddr >> 8) & 0xFF;
-    frame[3] = startAddr & 0xFF;
+    frame[2] = (wireAddr >> 8) & 0xFF;
+    frame[3] = wireAddr & 0xFF;
     frame[4] = (qty >> 8) & 0xFF;
     frame[5] = qty & 0xFF;
     frame[6] = byteCount;
@@ -919,17 +812,12 @@
     const text = document.getElementById('statusText');
     const btnC = document.getElementById('btnConnect');
     const btnD = document.getElementById('btnDisconnect');
-
     if (isConnected) {
-      dot.classList.add('connected');
-      text.textContent = 'Connected';
-      btnC.style.display = 'none';
-      btnD.style.display = 'flex';
+      dot.classList.add('connected'); text.textContent = 'Connected';
+      btnC.style.display = 'none'; btnD.style.display = 'flex';
     } else {
-      dot.classList.remove('connected');
-      text.textContent = 'Disconnected';
-      btnC.style.display = 'flex';
-      btnD.style.display = 'none';
+      dot.classList.remove('connected'); text.textContent = 'Disconnected';
+      btnC.style.display = 'flex'; btnD.style.display = 'none';
     }
   }
 
@@ -940,9 +828,7 @@
     const readableStream = port.readable;
     const tempReader = readableStream.getReader();
     let done = false;
-
     const timer = setTimeout(() => { done = true; }, timeout);
-
     try {
       while (!done) {
         const { value, done: streamDone } = await Promise.race([
@@ -951,9 +837,7 @@
         ]);
         if (streamDone || value === null) break;
         buffer.push(...value);
-        // Heuristic: if we have enough bytes, check if complete
         if (buffer.length >= expectedMinLen) {
-          // Small delay to collect trailing bytes
           await new Promise(r => setTimeout(r, 50));
           const { value: extra } = await Promise.race([
             tempReader.read(),
@@ -967,8 +851,44 @@
       clearTimeout(timer);
       tempReader.releaseLock();
     }
-
     return new Uint8Array(buffer);
+  }
+
+  // ─── Output Format Toggle ─────────────────────────────
+  function toggleFormat(format, btnEl) {
+    outputFormats[format] = !outputFormats[format];
+    btnEl.classList.toggle('active', outputFormats[format]);
+    if (lastResponse) {
+      displayResponse(lastResponse.fc, lastResponse.data, lastResponse.displayStartAddr, lastResponse.quantity, lastResponse.elapsed);
+    }
+  }
+
+  // ─── Conversion Helpers ────────────────────────────────
+  function toAsciiChar(val) {
+    const hi = (val >> 8) & 0xFF;
+    const lo = val & 0xFF;
+    const c = (b) => (b >= 32 && b <= 126) ? String.fromCharCode(b) : '·';
+    return c(hi) + c(lo);
+  }
+
+  function toFloat32(regA, regB) {
+    const buf = new ArrayBuffer(4);
+    const view = new DataView(buf);
+    view.setUint16(0, regA);
+    view.setUint16(2, regB);
+    return view.getFloat32(0);
+  }
+
+  function toRawBinStr(arr) {
+    return Array.from(arr).map(b => b.toString(2).padStart(8, '0')).join(' ');
+  }
+
+  function toRawAsciiStr(arr) {
+    return Array.from(arr).map(b => (b >= 32 && b <= 126) ? String.fromCharCode(b) : '·').join('');
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
   // ─── Send Query ────────────────────────────────────────
@@ -979,7 +899,8 @@
     }
 
     const slaveId = parseInt(document.getElementById('slaveId').value);
-    const startAddr = parseInt(document.getElementById('startAddr').value);
+    const displayStartAddr = parseInt(document.getElementById('startAddr').value);
+    const wireAddr = getWireAddress(displayStartAddr);
     const quantity = parseInt(document.getElementById('quantity').value);
     const fc = currentFC;
     let frame;
@@ -987,32 +908,37 @@
 
     try {
       if (fc === 1 || fc === 2) {
-        frame = buildReadFrame(slaveId, fc, startAddr, quantity);
+        frame = buildReadFrame(slaveId, fc, wireAddr, quantity);
         expectedMinLen = 5 + Math.ceil(quantity / 8);
       } else if (fc === 3 || fc === 4) {
-        frame = buildReadFrame(slaveId, fc, startAddr, quantity);
+        frame = buildReadFrame(slaveId, fc, wireAddr, quantity);
         expectedMinLen = 5 + quantity * 2;
       } else if (fc === 5) {
         const val = document.getElementById('writeValue').value.trim();
-        frame = buildWriteSingleCoilFrame(slaveId, startAddr, val === '1' || val.toLowerCase() === 'true' || val === 'on' || val === 'ff00');
+        frame = buildWriteSingleCoilFrame(slaveId, wireAddr, val === '1' || val.toLowerCase() === 'true' || val === 'on' || val === 'ff00');
         expectedMinLen = 8;
       } else if (fc === 6) {
         const val = parseInt(document.getElementById('writeValue').value.trim());
         if (isNaN(val) || val < 0 || val > 65535) { addLog('err', 'Invalid register value (0-65535)'); return; }
-        frame = buildWriteSingleRegFrame(slaveId, startAddr, val);
+        frame = buildWriteSingleRegFrame(slaveId, wireAddr, val);
         expectedMinLen = 8;
       } else if (fc === 15) {
         const vals = document.getElementById('writeValue').value.trim().split(/[\s,]+/).map(v => v === '1' || v.toLowerCase() === 'true');
-        frame = buildWriteMultipleCoilsFrame(slaveId, startAddr, vals);
+        frame = buildWriteMultipleCoilsFrame(slaveId, wireAddr, vals);
         expectedMinLen = 8;
       } else if (fc === 16) {
         const vals = document.getElementById('writeValue').value.trim().split(/[\s,]+/).map(v => parseInt(v));
         if (vals.some(v => isNaN(v))) { addLog('err', 'Invalid register values'); return; }
-        frame = buildWriteMultipleRegsFrame(slaveId, startAddr, vals);
+        frame = buildWriteMultipleRegsFrame(slaveId, wireAddr, vals);
         expectedMinLen = 8;
       }
 
-      addLog('tx', `[${fcNames[fc]}] Slave=${slaveId} Addr=${startAddr} Qty=${quantity}  →  ${toHexStr(frame)}`);
+      // Log with both display and wire addresses when offset active
+      const offsetEnabled = document.getElementById('minusOffsetEnabled').checked;
+      const addrInfo = offsetEnabled && wireAddr !== displayStartAddr
+        ? `Addr=${displayStartAddr}→Wire=${wireAddr}`
+        : `Addr=${wireAddr}`;
+      addLog('tx', `[${fcNames[fc]}] Slave=${slaveId} ${addrInfo} Qty=${quantity}  →  ${toHexStr(frame)}`);
 
       const startTime = performance.now();
       await writer.write(frame);
@@ -1031,7 +957,6 @@
         return;
       }
 
-      // Check for exception
       if (response[1] & 0x80) {
         const excCode = response[2];
         const excNames = { 1: 'Illegal Function', 2: 'Illegal Data Address', 3: 'Illegal Data Value', 4: 'Slave Device Failure' };
@@ -1039,20 +964,34 @@
         return;
       }
 
-      displayResponse(fc, response, startAddr, quantity, elapsed);
+      showRawFrame(response);
+      displayResponse(fc, response, displayStartAddr, quantity, elapsed);
 
     } catch (err) {
       addLog('err', `Query error: ${err.message}`);
     }
   }
 
+  // ─── Raw Frame Display ─────────────────────────────────
+  function showRawFrame(data) {
+    const panel = document.getElementById('rawFramePanel');
+    panel.style.display = 'block';
+    document.getElementById('rawHex').textContent = toHexStr(data);
+    document.getElementById('rawBin').textContent = toRawBinStr(data);
+    document.getElementById('rawAscii').textContent = toRawAsciiStr(data);
+  }
+
   // ─── Display Response ──────────────────────────────────
-  function displayResponse(fc, data, startAddr, quantity, elapsed) {
+  function displayResponse(fc, data, displayStartAddr, quantity, elapsed) {
+    // Cache for re-render
+    lastResponse = { fc, data, displayStartAddr, quantity, elapsed };
+
     const meta = document.getElementById('responseMeta');
     const table = document.getElementById('responseTable');
     const empty = document.getElementById('emptyState');
     const head = document.getElementById('tableHead');
     const body = document.getElementById('tableBody');
+    const formatBar = document.getElementById('outputFormatBar');
 
     meta.style.display = 'flex';
     document.getElementById('respTime').textContent = elapsed;
@@ -1061,12 +1000,12 @@
 
     empty.style.display = 'none';
     table.style.display = 'table';
-
     body.innerHTML = '';
 
     if (fc === 1 || fc === 2) {
-      head.innerHTML = '<tr><th>Address</th><th>Value</th><th>State</th></tr>';
-      const byteCount = data[2];
+      // ── Coil / Discrete Inputs ──
+      formatBar.style.display = 'none';
+      head.innerHTML = '<tr><th>Address</th><th>Value</th><th>State</th><th>Hex</th><th>Binary</th></tr>';
       for (let i = 0; i < quantity; i++) {
         const byteIdx = Math.floor(i / 8);
         const bitIdx = i % 8;
@@ -1075,45 +1014,89 @@
         tr.className = 'fade-in';
         tr.style.animationDelay = `${i * 15}ms`;
         tr.innerHTML = `
-          <td class="addr">${startAddr + i}</td>
+          <td class="addr">${displayStartAddr + i}</td>
           <td class="${val ? 'bool-true' : 'bool-false'}">${val}</td>
           <td class="${val ? 'bool-true' : 'bool-false'}">${val ? 'ON' : 'OFF'}</td>
+          <td class="hex">0x${val.toString(16).toUpperCase().padStart(2, '0')}</td>
+          <td class="bin">${val.toString(2)}</td>
         `;
         body.appendChild(tr);
       }
+
     } else if (fc === 3 || fc === 4) {
-      head.innerHTML = '<tr><th>Address</th><th>Decimal</th><th>Hex</th><th>Signed</th><th>Binary</th></tr>';
+      // ── Holding / Input Registers ──
+      formatBar.style.display = 'flex';
+
+      // Dynamic header based on active formats
+      let hdr = '<th>Address</th>';
+      if (outputFormats.decimal) hdr += '<th>Decimal</th>';
+      if (outputFormats.hex)     hdr += '<th>Hex</th>';
+      if (outputFormats.signed)  hdr += '<th>Signed</th>';
+      if (outputFormats.binary)  hdr += '<th>Binary</th>';
+      if (outputFormats.ascii)   hdr += '<th>ASCII</th>';
+      if (outputFormats.float32) hdr += '<th>Float32</th>';
+      head.innerHTML = `<tr>${hdr}</tr>`;
+
       const byteCount = data[2];
       const regCount = byteCount / 2;
+
+      // Collect register values for float32 pairing
+      const regValues = [];
       for (let i = 0; i < regCount; i++) {
-        const val = (data[3 + i * 2] << 8) | data[4 + i * 2];
+        regValues.push((data[3 + i * 2] << 8) | data[4 + i * 2]);
+      }
+
+      for (let i = 0; i < regCount; i++) {
+        const val = regValues[i];
         const signed = val > 32767 ? val - 65536 : val;
         const tr = document.createElement('tr');
         tr.className = 'fade-in';
         tr.style.animationDelay = `${i * 15}ms`;
-        tr.innerHTML = `
-          <td class="addr">${startAddr + i}</td>
-          <td class="val">${val}</td>
-          <td class="hex">0x${val.toString(16).toUpperCase().padStart(4, '0')}</td>
-          <td>${signed}</td>
-          <td class="bin">${val.toString(2).padStart(16, '0')}</td>
-        `;
+
+        let cells = `<td class="addr">${displayStartAddr + i}</td>`;
+        if (outputFormats.decimal) cells += `<td class="val">${val}</td>`;
+        if (outputFormats.hex)     cells += `<td class="hex">0x${val.toString(16).toUpperCase().padStart(4, '0')}</td>`;
+        if (outputFormats.signed)  cells += `<td>${signed}</td>`;
+        if (outputFormats.binary)  cells += `<td class="bin">${val.toString(2).padStart(16, '0')}</td>`;
+        if (outputFormats.ascii)   cells += `<td class="ascii">${escapeHtml(toAsciiChar(val))}</td>`;
+        if (outputFormats.float32) {
+          let f32 = '';
+          if (i % 2 === 0 && i + 1 < regCount) {
+            const fval = toFloat32(regValues[i], regValues[i + 1]);
+            f32 = isNaN(fval) || !isFinite(fval) ? '—' : fval.toPrecision(7);
+          } else if (i % 2 === 1) {
+            f32 = '<span style="opacity:0.3">↑ pair</span>';
+          } else {
+            f32 = '—';
+          }
+          cells += `<td class="val">${f32}</td>`;
+        }
+
+        tr.innerHTML = cells;
         body.appendChild(tr);
       }
+
     } else if (fc === 5 || fc === 6 || fc === 15 || fc === 16) {
-      head.innerHTML = '<tr><th>Field</th><th>Value</th></tr>';
+      // ── Write Responses ──
+      formatBar.style.display = 'none';
+      head.innerHTML = '<tr><th>Field</th><th>Value</th><th>Hex</th></tr>';
+      const respAddr = (data[2] << 8 | data[3]);
+      const valRaw = (data[4] << 8 | data[5]);
+
+      // Show the display address (original user addr) for the address field
       const info = [
-        ['Slave ID', data[0]],
-        ['Function Code', `0x${data[1].toString(16).toUpperCase().padStart(2, '0')}`],
-        ['Address', `${(data[2] << 8 | data[3])}`],
-        [fc === 5 || fc === 15 ? 'Coil Value' : 'Register Value', `${(data[4] << 8 | data[5])}`],
-        ['Status', 'Success ✓'],
+        ['Slave ID', data[0], `0x${data[0].toString(16).toUpperCase().padStart(2, '0')}`],
+        ['Function Code', data[1], `0x${data[1].toString(16).toUpperCase().padStart(2, '0')}`],
+        ['Address (wire)', respAddr, `0x${respAddr.toString(16).toUpperCase().padStart(4, '0')}`],
+        ['Address (display)', displayStartAddr, `—`],
+        [fc === 5 || fc === 15 ? 'Coil Value' : 'Register Value', valRaw, `0x${valRaw.toString(16).toUpperCase().padStart(4, '0')}`],
+        ['Status', 'Success ✓', '—'],
       ];
-      info.forEach(([field, val], i) => {
+      info.forEach(([field, val, hex], i) => {
         const tr = document.createElement('tr');
         tr.className = 'fade-in';
         tr.style.animationDelay = `${i * 30}ms`;
-        tr.innerHTML = `<td>${field}</td><td class="val">${val}</td>`;
+        tr.innerHTML = `<td>${field}</td><td class="val">${val}</td><td class="hex">${hex}</td>`;
         body.appendChild(tr);
       });
     }
@@ -1155,7 +1138,7 @@
       } else if (fc === 15) {
         writeLabel.textContent = 'Coil Values';
         writeValue.placeholder = '1,0,1,1,0,1';
-        writeHint.textContent = 'Comma or space-separated list of 1/0 values. Quantity is auto-derived.';
+        writeHint.textContent = 'Comma or space-separated list of 1/0 values.';
       } else if (fc === 16) {
         writeLabel.textContent = 'Register Values';
         writeValue.placeholder = '100, 200, 300';
