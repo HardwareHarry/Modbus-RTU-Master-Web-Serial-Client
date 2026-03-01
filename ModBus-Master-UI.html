@@ -1,0 +1,1226 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modbus RTU Master</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0a0e17;
+    --bg-secondary: #111827;
+    --bg-card: #1a2233;
+    --bg-input: #0d1420;
+    --border: #2a3a52;
+    --border-focus: #3b82f6;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-blue: #3b82f6;
+    --accent-green: #10b981;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --accent-cyan: #06b6d4;
+    --glow-blue: rgba(59, 130, 246, 0.15);
+    --glow-green: rgba(16, 185, 129, 0.15);
+    --glow-red: rgba(239, 68, 68, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; }
+
+  /* Header */
+  .header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700; font-size: 16px; color: #fff;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+
+  .header h1 {
+    font-size: 20px; font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .header h1 span { color: var(--text-muted); font-weight: 400; }
+
+  .connection-status {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--text-secondary);
+    background: var(--bg-card);
+    padding: 8px 14px; border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent-red);
+    box-shadow: 0 0 8px var(--accent-red);
+    transition: all 0.3s;
+  }
+
+  .status-dot.connected {
+    background: var(--accent-green);
+    box-shadow: 0 0 8px var(--accent-green);
+  }
+
+  /* Main Layout */
+  .main {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 0;
+    min-height: calc(100vh - 71px);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: rgba(59, 130, 246, 0.3); }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title svg { width: 14px; height: 14px; opacity: 0.6; }
+
+  /* Form Elements */
+  .form-group {
+    margin-bottom: 12px;
+  }
+
+  .form-group:last-child { margin-bottom: 0; }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px var(--glow-blue);
+  }
+
+  select { cursor: pointer; }
+  select option { background: var(--bg-secondary); }
+
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    width: 100%;
+  }
+
+  .btn svg { width: 16px; height: 16px; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-blue), #2563eb);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 6px 25px rgba(59, 130, 246, 0.45);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    background: var(--bg-input);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    background: var(--bg-card);
+    color: var(--text-primary);
+  }
+
+  .btn-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--accent-red);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  .btn-danger:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+
+  .btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  /* Content Area */
+  .content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+  }
+
+  /* Function Code Selector Tabs */
+  .fc-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding: 4px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .fc-tab {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .fc-tab:hover { color: var(--text-secondary); background: var(--bg-card); }
+
+  .fc-tab.active {
+    background: var(--accent-blue);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+  }
+
+  .fc-tab.write.active {
+    background: var(--accent-amber);
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+  }
+
+  /* Query Panel */
+  .query-panel {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .query-panel .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .query-panel h3 {
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .fc-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--glow-blue);
+    color: var(--accent-blue);
+    font-weight: 600;
+  }
+
+  .fc-badge.write {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--accent-amber);
+  }
+
+  .query-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .write-value-group {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+
+  .write-value-group h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-amber);
+    margin-bottom: 10px;
+  }
+
+  .send-btn-row {
+    display: flex; gap: 8px;
+  }
+
+  /* Response Area */
+  .response-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .response-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .response-header h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  .response-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    gap: 16px;
+  }
+
+  .response-meta span { display: flex; align-items: center; gap: 4px; }
+
+  .response-table-wrap {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+
+  thead {
+    background: var(--bg-card);
+  }
+
+  th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 9px 16px;
+    border-bottom: 1px solid rgba(42, 58, 82, 0.4);
+    color: var(--text-secondary);
+  }
+
+  tr:hover td { background: rgba(59, 130, 246, 0.04); }
+
+  td.addr { color: var(--accent-cyan); }
+  td.val { color: var(--text-primary); font-weight: 500; }
+  td.hex { color: var(--accent-amber); }
+  td.bin { color: var(--text-muted); font-size: 11px; }
+  td.bool-true { color: var(--accent-green); font-weight: 600; }
+  td.bool-false { color: var(--accent-red); }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    text-align: center;
+    gap: 12px;
+  }
+
+  .empty-state svg { width: 48px; height: 48px; opacity: 0.3; }
+  .empty-state p { font-size: 14px; }
+  .empty-state small { font-size: 12px; opacity: 0.6; }
+
+  /* Log Panel */
+  .log-panel {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .log-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .log-header h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .log-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: var(--glow-blue);
+    color: var(--accent-blue);
+  }
+
+  .log-body {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.7;
+  }
+
+  .log-body.collapsed { display: none; }
+
+  .log-entry {
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .log-entry:hover { background: var(--bg-card); }
+
+  .log-time { color: var(--text-muted); white-space: nowrap; }
+  .log-dir { font-weight: 600; width: 22px; }
+  .log-dir.tx { color: var(--accent-blue); }
+  .log-dir.rx { color: var(--accent-green); }
+  .log-dir.err { color: var(--accent-red); }
+  .log-msg { color: var(--text-secondary); word-break: break-all; }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in { animation: fadeIn 0.3s ease-out; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .sending .status-dot { animation: pulse 0.6s infinite; background: var(--accent-blue); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+  /* Web Serial API note */
+  .api-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: rgba(245, 158, 11, 0.06);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+    border-radius: 8px;
+    padding: 10px 14px;
+    line-height: 1.5;
+  }
+
+  .api-note strong { color: var(--accent-amber); }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">MB</div>
+      <h1>Modbus RTU Master <span>/ Serial Client</span></h1>
+    </div>
+    <div class="connection-status" id="connStatus">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Disconnected</span>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Serial Port Config -->
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24"/></svg>
+          Serial Port Configuration
+        </div>
+        <div class="form-group">
+          <label>Baud Rate</label>
+          <select id="baudRate">
+            <option value="1200">1200</option>
+            <option value="2400">2400</option>
+            <option value="4800">4800</option>
+            <option value="9600" selected>9600</option>
+            <option value="19200">19200</option>
+            <option value="38400">38400</option>
+            <option value="57600">57600</option>
+            <option value="115200">115200</option>
+          </select>
+        </div>
+        <div class="row-2">
+          <div class="form-group">
+            <label>Data Bits</label>
+            <select id="dataBits">
+              <option value="7">7</option>
+              <option value="8" selected>8</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Stop Bits</label>
+            <select id="stopBits">
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+            </select>
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="form-group">
+            <label>Parity</label>
+            <select id="parity">
+              <option value="none" selected>None</option>
+              <option value="even">Even</option>
+              <option value="odd">Odd</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Timeout (ms)</label>
+            <input type="number" id="timeout" value="1000" min="100" max="10000" step="100">
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top: 14px;">
+          <button class="btn btn-primary" id="btnConnect" onclick="toggleConnection()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            Connect
+          </button>
+          <button class="btn btn-danger" id="btnDisconnect" onclick="disconnect()" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            Disconnect
+          </button>
+        </div>
+      </div>
+
+      <!-- Slave Configuration -->
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h4"/></svg>
+          Slave Configuration
+        </div>
+        <div class="row-2">
+          <div class="form-group">
+            <label>Slave ID (1-247)</label>
+            <input type="number" id="slaveId" value="1" min="1" max="247">
+          </div>
+          <div class="form-group">
+            <label>Start Address</label>
+            <input type="number" id="startAddr" value="0" min="0" max="65535">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Quantity</label>
+          <input type="number" id="quantity" value="10" min="1" max="125">
+        </div>
+      </div>
+
+      <!-- Polling -->
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Auto-Polling
+        </div>
+        <div class="row-2">
+          <div class="form-group">
+            <label>Interval (ms)</label>
+            <input type="number" id="pollInterval" value="1000" min="100" max="60000" step="100">
+          </div>
+          <div class="form-group" style="display:flex;align-items:flex-end;">
+            <button class="btn btn-secondary" id="btnPoll" onclick="togglePolling()" style="width:100%;">
+              Start Polling
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="api-note">
+        <strong>⚡ Web Serial API</strong><br>
+        Requires Chrome/Edge 89+. Click <strong>Connect</strong> to select your serial port. The browser will prompt for device access.
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Function Code Tabs -->
+      <div class="fc-tabs">
+        <button class="fc-tab active" onclick="setFC(1, this)">FC01 Read Coils</button>
+        <button class="fc-tab" onclick="setFC(2, this)">FC02 Read Discrete</button>
+        <button class="fc-tab" onclick="setFC(3, this)">FC03 Read Holding</button>
+        <button class="fc-tab" onclick="setFC(4, this)">FC04 Read Input</button>
+        <button class="fc-tab write" onclick="setFC(5, this)">FC05 Write Coil</button>
+        <button class="fc-tab write" onclick="setFC(6, this)">FC06 Write Register</button>
+        <button class="fc-tab write" onclick="setFC(15, this)">FC15 Write Coils</button>
+        <button class="fc-tab write" onclick="setFC(16, this)">FC16 Write Registers</button>
+      </div>
+
+      <!-- Query Panel -->
+      <div class="query-panel">
+        <div class="panel-header">
+          <h3>
+            <span id="fcName">Read Coils</span>
+            <span class="fc-badge" id="fcBadge">FC 01</span>
+          </h3>
+        </div>
+
+        <!-- Write Value Fields (hidden by default) -->
+        <div class="write-value-group" id="writeGroup" style="display:none;">
+          <h4>Write Value(s)</h4>
+          <div class="form-group">
+            <label id="writeLabel">Value</label>
+            <input type="text" id="writeValue" placeholder="Enter value(s)...">
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:6px;" id="writeHint"></div>
+        </div>
+
+        <div class="send-btn-row">
+          <button class="btn btn-primary" onclick="sendQuery()" style="max-width:200px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            Send Query
+          </button>
+        </div>
+      </div>
+
+      <!-- Response Area -->
+      <div class="response-area">
+        <div class="response-header">
+          <h3>Response Data</h3>
+          <div class="response-meta" id="responseMeta" style="display:none;">
+            <span>⏱ <span id="respTime">--</span>ms</span>
+            <span>📦 <span id="respBytes">--</span> bytes</span>
+            <span>Slave <span id="respSlave">--</span></span>
+          </div>
+        </div>
+
+        <div class="response-table-wrap" id="responseWrap">
+          <div class="empty-state" id="emptyState">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h4"/></svg>
+            <p>No data yet</p>
+            <small>Connect to a serial port and send a Modbus query to see results.</small>
+          </div>
+          <table id="responseTable" style="display:none;">
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Log Panel -->
+      <div class="log-panel">
+        <div class="log-header" onclick="toggleLog()">
+          <h3>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+            Communication Log
+            <span class="log-count" id="logCount">0</span>
+          </h3>
+          <button class="btn btn-secondary" style="width:auto;padding:4px 10px;font-size:11px;" onclick="event.stopPropagation();clearLog();">Clear</button>
+        </div>
+        <div class="log-body" id="logBody"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ─── State ──────────────────────────────────────────────
+  let port = null;
+  let reader = null;
+  let writer = null;
+  let connected = false;
+  let currentFC = 1;
+  let pollingTimer = null;
+  let isPolling = false;
+  let logEntries = 0;
+  let logCollapsed = false;
+
+  // ─── CRC16 Modbus ──────────────────────────────────────
+  function crc16(buffer) {
+    let crc = 0xFFFF;
+    for (let i = 0; i < buffer.length; i++) {
+      crc ^= buffer[i];
+      for (let j = 0; j < 8; j++) {
+        if (crc & 1) crc = (crc >> 1) ^ 0xA001;
+        else crc >>= 1;
+      }
+    }
+    return crc;
+  }
+
+  function appendCRC(frame) {
+    const crc = crc16(frame);
+    const full = new Uint8Array(frame.length + 2);
+    full.set(frame);
+    full[frame.length] = crc & 0xFF;
+    full[frame.length + 1] = (crc >> 8) & 0xFF;
+    return full;
+  }
+
+  function verifyCRC(data) {
+    if (data.length < 4) return false;
+    const payload = data.slice(0, data.length - 2);
+    const received = data[data.length - 2] | (data[data.length - 1] << 8);
+    return crc16(payload) === received;
+  }
+
+  // ─── Frame Builders ────────────────────────────────────
+  function buildReadFrame(slaveId, fc, startAddr, quantity) {
+    const frame = new Uint8Array(6);
+    frame[0] = slaveId;
+    frame[1] = fc;
+    frame[2] = (startAddr >> 8) & 0xFF;
+    frame[3] = startAddr & 0xFF;
+    frame[4] = (quantity >> 8) & 0xFF;
+    frame[5] = quantity & 0xFF;
+    return appendCRC(frame);
+  }
+
+  function buildWriteSingleCoilFrame(slaveId, addr, value) {
+    const frame = new Uint8Array(6);
+    frame[0] = slaveId;
+    frame[1] = 5;
+    frame[2] = (addr >> 8) & 0xFF;
+    frame[3] = addr & 0xFF;
+    frame[4] = value ? 0xFF : 0x00;
+    frame[5] = 0x00;
+    return appendCRC(frame);
+  }
+
+  function buildWriteSingleRegFrame(slaveId, addr, value) {
+    const frame = new Uint8Array(6);
+    frame[0] = slaveId;
+    frame[1] = 6;
+    frame[2] = (addr >> 8) & 0xFF;
+    frame[3] = addr & 0xFF;
+    frame[4] = (value >> 8) & 0xFF;
+    frame[5] = value & 0xFF;
+    return appendCRC(frame);
+  }
+
+  function buildWriteMultipleCoilsFrame(slaveId, startAddr, values) {
+    const qty = values.length;
+    const byteCount = Math.ceil(qty / 8);
+    const frame = new Uint8Array(7 + byteCount);
+    frame[0] = slaveId;
+    frame[1] = 15;
+    frame[2] = (startAddr >> 8) & 0xFF;
+    frame[3] = startAddr & 0xFF;
+    frame[4] = (qty >> 8) & 0xFF;
+    frame[5] = qty & 0xFF;
+    frame[6] = byteCount;
+    for (let i = 0; i < qty; i++) {
+      if (values[i]) frame[7 + Math.floor(i / 8)] |= (1 << (i % 8));
+    }
+    return appendCRC(frame);
+  }
+
+  function buildWriteMultipleRegsFrame(slaveId, startAddr, values) {
+    const qty = values.length;
+    const byteCount = qty * 2;
+    const frame = new Uint8Array(7 + byteCount);
+    frame[0] = slaveId;
+    frame[1] = 16;
+    frame[2] = (startAddr >> 8) & 0xFF;
+    frame[3] = startAddr & 0xFF;
+    frame[4] = (qty >> 8) & 0xFF;
+    frame[5] = qty & 0xFF;
+    frame[6] = byteCount;
+    for (let i = 0; i < qty; i++) {
+      frame[7 + i * 2] = (values[i] >> 8) & 0xFF;
+      frame[8 + i * 2] = values[i] & 0xFF;
+    }
+    return appendCRC(frame);
+  }
+
+  // ─── Serial Connection ─────────────────────────────────
+  async function toggleConnection() {
+    if (connected) return;
+    try {
+      if (!('serial' in navigator)) {
+        addLog('err', 'Web Serial API not supported. Use Chrome/Edge 89+.');
+        alert('Web Serial API not supported. Please use Chrome or Edge 89+.');
+        return;
+      }
+      port = await navigator.serial.requestPort();
+      const baudRate = parseInt(document.getElementById('baudRate').value);
+      const dataBits = parseInt(document.getElementById('dataBits').value);
+      const stopBits = parseInt(document.getElementById('stopBits').value);
+      const parity = document.getElementById('parity').value;
+
+      await port.open({ baudRate, dataBits, stopBits, parity });
+      writer = port.writable.getWriter();
+      connected = true;
+      updateConnectionUI(true);
+      addLog('tx', `Connected @ ${baudRate} ${dataBits}${parity[0].toUpperCase()}${stopBits}`);
+    } catch (err) {
+      addLog('err', `Connection failed: ${err.message}`);
+    }
+  }
+
+  async function disconnect() {
+    try {
+      if (isPolling) togglePolling();
+      if (writer) { writer.releaseLock(); writer = null; }
+      if (port) { await port.close(); port = null; }
+      connected = false;
+      updateConnectionUI(false);
+      addLog('err', 'Disconnected');
+    } catch (err) {
+      addLog('err', `Disconnect error: ${err.message}`);
+      connected = false;
+      updateConnectionUI(false);
+    }
+  }
+
+  function updateConnectionUI(isConnected) {
+    const dot = document.getElementById('statusDot');
+    const text = document.getElementById('statusText');
+    const btnC = document.getElementById('btnConnect');
+    const btnD = document.getElementById('btnDisconnect');
+
+    if (isConnected) {
+      dot.classList.add('connected');
+      text.textContent = 'Connected';
+      btnC.style.display = 'none';
+      btnD.style.display = 'flex';
+    } else {
+      dot.classList.remove('connected');
+      text.textContent = 'Disconnected';
+      btnC.style.display = 'flex';
+      btnD.style.display = 'none';
+    }
+  }
+
+  // ─── Read Response ─────────────────────────────────────
+  async function readResponse(expectedMinLen) {
+    const timeout = parseInt(document.getElementById('timeout').value) || 1000;
+    const buffer = [];
+    const readableStream = port.readable;
+    const tempReader = readableStream.getReader();
+    let done = false;
+
+    const timer = setTimeout(() => { done = true; }, timeout);
+
+    try {
+      while (!done) {
+        const { value, done: streamDone } = await Promise.race([
+          tempReader.read(),
+          new Promise(resolve => setTimeout(() => resolve({ value: null, done: true }), timeout))
+        ]);
+        if (streamDone || value === null) break;
+        buffer.push(...value);
+        // Heuristic: if we have enough bytes, check if complete
+        if (buffer.length >= expectedMinLen) {
+          // Small delay to collect trailing bytes
+          await new Promise(r => setTimeout(r, 50));
+          const { value: extra } = await Promise.race([
+            tempReader.read(),
+            new Promise(r => setTimeout(() => r({ value: null, done: true }), 80))
+          ]);
+          if (extra) buffer.push(...extra);
+          break;
+        }
+      }
+    } finally {
+      clearTimeout(timer);
+      tempReader.releaseLock();
+    }
+
+    return new Uint8Array(buffer);
+  }
+
+  // ─── Send Query ────────────────────────────────────────
+  async function sendQuery() {
+    if (!connected) {
+      addLog('err', 'Not connected. Please connect to a serial port first.');
+      return;
+    }
+
+    const slaveId = parseInt(document.getElementById('slaveId').value);
+    const startAddr = parseInt(document.getElementById('startAddr').value);
+    const quantity = parseInt(document.getElementById('quantity').value);
+    const fc = currentFC;
+    let frame;
+    let expectedMinLen;
+
+    try {
+      if (fc === 1 || fc === 2) {
+        frame = buildReadFrame(slaveId, fc, startAddr, quantity);
+        expectedMinLen = 5 + Math.ceil(quantity / 8);
+      } else if (fc === 3 || fc === 4) {
+        frame = buildReadFrame(slaveId, fc, startAddr, quantity);
+        expectedMinLen = 5 + quantity * 2;
+      } else if (fc === 5) {
+        const val = document.getElementById('writeValue').value.trim();
+        frame = buildWriteSingleCoilFrame(slaveId, startAddr, val === '1' || val.toLowerCase() === 'true' || val === 'on' || val === 'ff00');
+        expectedMinLen = 8;
+      } else if (fc === 6) {
+        const val = parseInt(document.getElementById('writeValue').value.trim());
+        if (isNaN(val) || val < 0 || val > 65535) { addLog('err', 'Invalid register value (0-65535)'); return; }
+        frame = buildWriteSingleRegFrame(slaveId, startAddr, val);
+        expectedMinLen = 8;
+      } else if (fc === 15) {
+        const vals = document.getElementById('writeValue').value.trim().split(/[\s,]+/).map(v => v === '1' || v.toLowerCase() === 'true');
+        frame = buildWriteMultipleCoilsFrame(slaveId, startAddr, vals);
+        expectedMinLen = 8;
+      } else if (fc === 16) {
+        const vals = document.getElementById('writeValue').value.trim().split(/[\s,]+/).map(v => parseInt(v));
+        if (vals.some(v => isNaN(v))) { addLog('err', 'Invalid register values'); return; }
+        frame = buildWriteMultipleRegsFrame(slaveId, startAddr, vals);
+        expectedMinLen = 8;
+      }
+
+      addLog('tx', `[${fcNames[fc]}] Slave=${slaveId} Addr=${startAddr} Qty=${quantity}  →  ${toHexStr(frame)}`);
+
+      const startTime = performance.now();
+      await writer.write(frame);
+      const response = await readResponse(expectedMinLen);
+      const elapsed = (performance.now() - startTime).toFixed(1);
+
+      if (response.length === 0) {
+        addLog('err', `No response (timeout)`);
+        return;
+      }
+
+      addLog('rx', `${toHexStr(response)}  (${elapsed}ms, ${response.length} bytes)`);
+
+      if (!verifyCRC(response)) {
+        addLog('err', 'CRC check failed!');
+        return;
+      }
+
+      // Check for exception
+      if (response[1] & 0x80) {
+        const excCode = response[2];
+        const excNames = { 1: 'Illegal Function', 2: 'Illegal Data Address', 3: 'Illegal Data Value', 4: 'Slave Device Failure' };
+        addLog('err', `Exception: ${excNames[excCode] || 'Unknown'} (code ${excCode})`);
+        return;
+      }
+
+      displayResponse(fc, response, startAddr, quantity, elapsed);
+
+    } catch (err) {
+      addLog('err', `Query error: ${err.message}`);
+    }
+  }
+
+  // ─── Display Response ──────────────────────────────────
+  function displayResponse(fc, data, startAddr, quantity, elapsed) {
+    const meta = document.getElementById('responseMeta');
+    const table = document.getElementById('responseTable');
+    const empty = document.getElementById('emptyState');
+    const head = document.getElementById('tableHead');
+    const body = document.getElementById('tableBody');
+
+    meta.style.display = 'flex';
+    document.getElementById('respTime').textContent = elapsed;
+    document.getElementById('respBytes').textContent = data.length;
+    document.getElementById('respSlave').textContent = data[0];
+
+    empty.style.display = 'none';
+    table.style.display = 'table';
+
+    body.innerHTML = '';
+
+    if (fc === 1 || fc === 2) {
+      head.innerHTML = '<tr><th>Address</th><th>Value</th><th>State</th></tr>';
+      const byteCount = data[2];
+      for (let i = 0; i < quantity; i++) {
+        const byteIdx = Math.floor(i / 8);
+        const bitIdx = i % 8;
+        const val = (data[3 + byteIdx] >> bitIdx) & 1;
+        const tr = document.createElement('tr');
+        tr.className = 'fade-in';
+        tr.style.animationDelay = `${i * 15}ms`;
+        tr.innerHTML = `
+          <td class="addr">${startAddr + i}</td>
+          <td class="${val ? 'bool-true' : 'bool-false'}">${val}</td>
+          <td class="${val ? 'bool-true' : 'bool-false'}">${val ? 'ON' : 'OFF'}</td>
+        `;
+        body.appendChild(tr);
+      }
+    } else if (fc === 3 || fc === 4) {
+      head.innerHTML = '<tr><th>Address</th><th>Decimal</th><th>Hex</th><th>Signed</th><th>Binary</th></tr>';
+      const byteCount = data[2];
+      const regCount = byteCount / 2;
+      for (let i = 0; i < regCount; i++) {
+        const val = (data[3 + i * 2] << 8) | data[4 + i * 2];
+        const signed = val > 32767 ? val - 65536 : val;
+        const tr = document.createElement('tr');
+        tr.className = 'fade-in';
+        tr.style.animationDelay = `${i * 15}ms`;
+        tr.innerHTML = `
+          <td class="addr">${startAddr + i}</td>
+          <td class="val">${val}</td>
+          <td class="hex">0x${val.toString(16).toUpperCase().padStart(4, '0')}</td>
+          <td>${signed}</td>
+          <td class="bin">${val.toString(2).padStart(16, '0')}</td>
+        `;
+        body.appendChild(tr);
+      }
+    } else if (fc === 5 || fc === 6 || fc === 15 || fc === 16) {
+      head.innerHTML = '<tr><th>Field</th><th>Value</th></tr>';
+      const info = [
+        ['Slave ID', data[0]],
+        ['Function Code', `0x${data[1].toString(16).toUpperCase().padStart(2, '0')}`],
+        ['Address', `${(data[2] << 8 | data[3])}`],
+        [fc === 5 || fc === 15 ? 'Coil Value' : 'Register Value', `${(data[4] << 8 | data[5])}`],
+        ['Status', 'Success ✓'],
+      ];
+      info.forEach(([field, val], i) => {
+        const tr = document.createElement('tr');
+        tr.className = 'fade-in';
+        tr.style.animationDelay = `${i * 30}ms`;
+        tr.innerHTML = `<td>${field}</td><td class="val">${val}</td>`;
+        body.appendChild(tr);
+      });
+    }
+  }
+
+  // ─── FC Management ─────────────────────────────────────
+  const fcNames = {
+    1: 'Read Coils', 2: 'Read Discrete Inputs', 3: 'Read Holding Registers',
+    4: 'Read Input Registers', 5: 'Write Single Coil', 6: 'Write Single Register',
+    15: 'Write Multiple Coils', 16: 'Write Multiple Registers'
+  };
+
+  const writeFCs = [5, 6, 15, 16];
+
+  function setFC(fc, tabEl) {
+    currentFC = fc;
+    document.querySelectorAll('.fc-tab').forEach(t => t.classList.remove('active'));
+    tabEl.classList.add('active');
+    document.getElementById('fcName').textContent = fcNames[fc];
+    const badge = document.getElementById('fcBadge');
+    badge.textContent = `FC ${fc.toString().padStart(2, '0')}`;
+    badge.className = writeFCs.includes(fc) ? 'fc-badge write' : 'fc-badge';
+
+    const writeGroup = document.getElementById('writeGroup');
+    const writeLabel = document.getElementById('writeLabel');
+    const writeHint = document.getElementById('writeHint');
+    const writeValue = document.getElementById('writeValue');
+
+    if (writeFCs.includes(fc)) {
+      writeGroup.style.display = 'block';
+      if (fc === 5) {
+        writeLabel.textContent = 'Coil Value';
+        writeValue.placeholder = '1 or 0 (ON/OFF)';
+        writeHint.textContent = 'Enter 1/true/on for ON, 0/false/off for OFF.';
+      } else if (fc === 6) {
+        writeLabel.textContent = 'Register Value (0-65535)';
+        writeValue.placeholder = 'e.g. 1234';
+        writeHint.textContent = 'Enter a single unsigned 16-bit integer value.';
+      } else if (fc === 15) {
+        writeLabel.textContent = 'Coil Values';
+        writeValue.placeholder = '1,0,1,1,0,1';
+        writeHint.textContent = 'Comma or space-separated list of 1/0 values. Quantity is auto-derived.';
+      } else if (fc === 16) {
+        writeLabel.textContent = 'Register Values';
+        writeValue.placeholder = '100, 200, 300';
+        writeHint.textContent = 'Comma or space-separated list of 16-bit unsigned integers.';
+      }
+    } else {
+      writeGroup.style.display = 'none';
+    }
+  }
+
+  // ─── Polling ───────────────────────────────────────────
+  function togglePolling() {
+    const btn = document.getElementById('btnPoll');
+    if (isPolling) {
+      clearInterval(pollingTimer);
+      pollingTimer = null;
+      isPolling = false;
+      btn.textContent = 'Start Polling';
+      btn.classList.remove('btn-danger');
+      btn.classList.add('btn-secondary');
+      addLog('tx', 'Polling stopped');
+    } else {
+      if (!connected) { addLog('err', 'Connect first before polling.'); return; }
+      const interval = parseInt(document.getElementById('pollInterval').value) || 1000;
+      isPolling = true;
+      btn.textContent = 'Stop Polling';
+      btn.classList.remove('btn-secondary');
+      btn.classList.add('btn-danger');
+      addLog('tx', `Polling started every ${interval}ms`);
+      sendQuery();
+      pollingTimer = setInterval(sendQuery, interval);
+    }
+  }
+
+  // ─── Logging ───────────────────────────────────────────
+  function addLog(dir, msg) {
+    logEntries++;
+    document.getElementById('logCount').textContent = logEntries;
+    const logBody = document.getElementById('logBody');
+    const now = new Date();
+    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;
+    const dirLabel = dir === 'tx' ? 'TX' : dir === 'rx' ? 'RX' : '!!';
+    const entry = document.createElement('div');
+    entry.className = 'log-entry fade-in';
+    entry.innerHTML = `<span class="log-time">${time}</span><span class="log-dir ${dir}">${dirLabel}</span><span class="log-msg">${msg}</span>`;
+    logBody.appendChild(entry);
+    logBody.scrollTop = logBody.scrollHeight;
+  }
+
+  function clearLog() {
+    document.getElementById('logBody').innerHTML = '';
+    logEntries = 0;
+    document.getElementById('logCount').textContent = '0';
+  }
+
+  function toggleLog() {
+    const body = document.getElementById('logBody');
+    logCollapsed = !logCollapsed;
+    body.classList.toggle('collapsed', logCollapsed);
+  }
+
+  // ─── Helpers ───────────────────────────────────────────
+  function toHexStr(arr) {
+    return Array.from(arr).map(b => b.toString(16).toUpperCase().padStart(2, '0')).join(' ');
+  }
+</script>
+</body>
+</html>
