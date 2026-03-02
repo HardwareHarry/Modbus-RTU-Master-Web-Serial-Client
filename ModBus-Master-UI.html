@@ -13,7 +13,6 @@
     --bg-card: #1a2233;
     --bg-input: #0d1420;
     --border: #2a3a52;
-    --border-focus: #3b82f6;
     --text-primary: #e2e8f0;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
@@ -24,8 +23,6 @@
     --accent-cyan: #06b6d4;
     --accent-purple: #a78bfa;
     --glow-blue: rgba(59, 130, 246, 0.15);
-    --glow-green: rgba(16, 185, 129, 0.15);
-    --glow-red: rgba(239, 68, 68, 0.15);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,100 +37,72 @@
 
   body::before {
     content: '';
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background-image:
       linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
     background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
+    pointer-events: none; z-index: 0;
   }
 
   .app { position: relative; z-index: 1; }
 
   .header {
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 32px;
-    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+    padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
   }
-
   .header-left { display: flex; align-items: center; gap: 14px; }
-
   .logo {
     width: 38px; height: 38px;
     background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700; font-size: 16px; color: #fff;
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 16px; color: #fff;
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
   }
-
   .header h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
   .header h1 span { color: var(--text-muted); font-weight: 400; }
 
   .connection-status {
     display: flex; align-items: center; gap: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px; color: var(--text-secondary);
-    background: var(--bg-card); padding: 8px 14px; border-radius: 8px;
-    border: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary);
+    background: var(--bg-card); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border);
   }
-
   .status-dot {
     width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red);
-    transition: all 0.3s;
+    background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); transition: all 0.3s;
   }
-
   .status-dot.connected { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
 
-  .main {
-    display: grid; grid-template-columns: 340px 1fr;
-    gap: 0; min-height: calc(100vh - 71px);
-  }
+  .main { display: grid; grid-template-columns: 340px 1fr; gap: 0; min-height: calc(100vh - 71px); }
 
   .sidebar {
     background: var(--bg-secondary); border-right: 1px solid var(--border);
-    padding: 24px; overflow-y: auto;
-    display: flex; flex-direction: column; gap: 20px;
+    padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
   }
 
   .card {
     background: var(--bg-card); border: 1px solid var(--border);
     border-radius: 12px; padding: 20px; transition: border-color 0.2s;
   }
-
   .card:hover { border-color: rgba(59, 130, 246, 0.3); }
 
   .card-title {
-    font-size: 11px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 14px;
-    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
   }
-
   .card-title svg { width: 14px; height: 14px; opacity: 0.6; }
 
   .form-group { margin-bottom: 12px; }
   .form-group:last-child { margin-bottom: 0; }
-
-  label {
-    display: block; font-size: 12px; font-weight: 500;
-    color: var(--text-secondary); margin-bottom: 5px;
-  }
+  label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 5px; }
 
   input, select {
-    width: 100%; padding: 9px 12px;
-    background: var(--bg-input); border: 1px solid var(--border);
+    width: 100%; padding: 9px 12px; background: var(--bg-input); border: 1px solid var(--border);
     border-radius: 8px; color: var(--text-primary);
     font-family: 'JetBrains Mono', monospace; font-size: 13px;
     outline: none; transition: border-color 0.2s, box-shadow 0.2s;
   }
-
   input:focus, select:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px var(--glow-blue); }
-
   select { cursor: pointer; }
   select option { background: var(--bg-secondary); }
 
@@ -145,23 +114,17 @@
     font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600;
     cursor: pointer; border: none; transition: all 0.2s; width: 100%;
   }
-
   .btn svg { width: 16px; height: 16px; }
-
   .btn-primary {
     background: linear-gradient(135deg, var(--accent-blue), #2563eb);
     color: #fff; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
   }
-
   .btn-primary:hover { box-shadow: 0 6px 25px rgba(59, 130, 246, 0.45); transform: translateY(-1px); }
   .btn-primary:active { transform: translateY(0); }
-
   .btn-secondary { background: var(--bg-input); color: var(--text-secondary); border: 1px solid var(--border); }
   .btn-secondary:hover { background: var(--bg-card); color: var(--text-primary); }
-
   .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.2); }
   .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
-
   .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
 
   .content { padding: 24px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
@@ -170,69 +133,40 @@
     display: flex; gap: 6px; flex-wrap: wrap; padding: 4px;
     background: var(--bg-secondary); border-radius: 12px; border: 1px solid var(--border);
   }
-
   .fc-tab {
     padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 500;
     cursor: pointer; border: none; background: transparent;
     color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
     transition: all 0.2s; white-space: nowrap;
   }
-
   .fc-tab:hover { color: var(--text-secondary); background: var(--bg-card); }
-
   .fc-tab.active { background: var(--accent-blue); color: #fff; box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3); }
   .fc-tab.write.active { background: var(--accent-amber); box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3); }
 
   .query-panel { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-
   .query-panel .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
   .query-panel h3 { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-
   .fc-badge {
-    font-family: 'JetBrains Mono', monospace; font-size: 11px;
-    padding: 3px 8px; border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 3px 8px; border-radius: 6px;
     background: var(--glow-blue); color: var(--accent-blue); font-weight: 600;
   }
-
   .fc-badge.write { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
 
   .write-value-group {
     background: var(--bg-card); border: 1px solid var(--border);
     border-radius: 8px; padding: 14px; margin-bottom: 16px;
   }
-
   .write-value-group h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-amber); margin-bottom: 10px; }
 
   .send-btn-row { display: flex; gap: 8px; }
 
   /* Wire address preview */
   .wire-addr-preview {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px; color: var(--accent-cyan);
-    background: rgba(6, 182, 212, 0.08);
-    border: 1px solid rgba(6, 182, 212, 0.15);
-    border-radius: 6px; padding: 6px 10px;
-    margin-top: 8px; display: none; line-height: 1.5;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent-cyan);
+    background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.15);
+    border-radius: 6px; padding: 6px 10px; margin-top: 8px; display: none; line-height: 1.5;
   }
-
   .wire-addr-preview.visible { display: block; }
-
-  /* Output Format Toggle Bar */
-  .output-format-bar { display: none; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .output-format-bar .format-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-right: 4px; }
-
-  .format-toggle { display: flex; gap: 2px; padding: 3px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border); }
-
-  .format-btn {
-    padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600;
-    cursor: pointer; border: none; background: transparent;
-    color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
-    transition: all 0.2s; white-space: nowrap;
-  }
-
-  .format-btn:hover { color: var(--text-secondary); }
-
-  .format-btn.active { background: var(--accent-purple); color: #fff; box-shadow: 0 2px 8px rgba(167, 139, 250, 0.3); }
 
   .offset-indicator {
     font-family: 'JetBrains Mono', monospace; font-size: 11px;
@@ -240,11 +174,9 @@
     border: 1px solid rgba(6, 182, 212, 0.2);
     padding: 4px 10px; border-radius: 6px; display: none; align-items: center; gap: 4px;
   }
-
   .offset-indicator.visible { display: inline-flex; }
 
   .response-area { flex: 1; display: flex; flex-direction: column; gap: 16px; }
-
   .response-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
   .response-header h3 { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
 
@@ -252,7 +184,6 @@
     font-family: 'JetBrains Mono', monospace; font-size: 11px;
     color: var(--text-muted); display: flex; gap: 16px;
   }
-
   .response-meta span { display: flex; align-items: center; gap: 4px; }
 
   .response-table-wrap {
@@ -260,16 +191,17 @@
     border-radius: 12px; overflow: hidden; flex: 1;
   }
 
+  /* Response table with horizontal scroll for many columns */
+  .response-table-inner { overflow-x: auto; }
+
   table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
   thead { background: var(--bg-card); }
-
   th {
-    text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600;
+    text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.06em;
-    color: var(--text-muted); border-bottom: 1px solid var(--border);
+    color: var(--text-muted); border-bottom: 1px solid var(--border); white-space: nowrap;
   }
-
-  td { padding: 9px 16px; border-bottom: 1px solid rgba(42, 58, 82, 0.4); color: var(--text-secondary); }
+  td { padding: 9px 14px; border-bottom: 1px solid rgba(42, 58, 82, 0.4); color: var(--text-secondary); white-space: nowrap; }
   tr:hover td { background: rgba(59, 130, 246, 0.04); }
 
   td.addr { color: var(--accent-cyan); }
@@ -279,15 +211,66 @@
   td.ascii { color: var(--accent-purple); font-weight: 500; }
   td.bool-true { color: var(--accent-green); font-weight: 600; }
   td.bool-false { color: var(--accent-red); }
+  td.interpreted { color: var(--accent-green); font-weight: 500; }
+  td.span-note { color: var(--text-muted); font-style: italic; font-size: 11px; }
 
   .empty-state {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     padding: 60px 20px; color: var(--text-muted); text-align: center; gap: 12px;
   }
-
   .empty-state svg { width: 48px; height: 48px; opacity: 0.3; }
   .empty-state p { font-size: 14px; }
   .empty-state small { font-size: 12px; opacity: 0.6; }
+
+  /* Data Type Selector Bar */
+  .dtype-bar {
+    background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; display: none;
+  }
+  .dtype-bar.visible { display: block; }
+  .dtype-bar-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;
+  }
+  .dtype-bar-header h4 {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);
+  }
+  .dtype-bar-actions { display: flex; gap: 6px; }
+  .dtype-bar-actions button {
+    padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600;
+    cursor: pointer; border: none; font-family: 'JetBrains Mono', monospace; transition: all 0.15s;
+    background: var(--accent-purple); color: #fff;
+  }
+  .dtype-bar-actions button:hover { opacity: 0.85; transform: translateY(-1px); }
+  .dtype-bar-actions button.secondary-action {
+    background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border);
+  }
+
+  .dtype-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 6px; max-height: 200px; overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .dtype-item {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 8px; font-size: 11px;
+  }
+  .dtype-item .dtype-addr {
+    color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace;
+    min-width: 48px; font-weight: 600;
+  }
+  .dtype-item select {
+    padding: 4px 6px; font-size: 11px; border-radius: 4px; flex: 1; min-width: 0;
+  }
+
+  /* Byte order selector */
+  .byte-order-row {
+    display: flex; align-items: center; gap: 8px; margin-top: 8px;
+    font-size: 11px; color: var(--text-muted);
+  }
+  .byte-order-row label { margin: 0; font-size: 11px; }
+  .byte-order-row select { width: auto; padding: 4px 8px; font-size: 11px; border-radius: 4px; }
 
   /* Raw Frame Panel */
   .raw-frame-panel {
@@ -296,7 +279,6 @@
     font-family: 'JetBrains Mono', monospace; font-size: 11px;
     display: none; line-height: 1.7;
   }
-
   .raw-frame-panel .raw-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; }
   .raw-row { display: flex; gap: 8px; margin-bottom: 2px; }
   .raw-tag { color: var(--text-muted); min-width: 46px; font-weight: 600; }
@@ -306,24 +288,14 @@
 
   /* Log Panel */
   .log-panel { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-
   .log-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 16px; border-bottom: 1px solid var(--border);
-    cursor: pointer; user-select: none;
+    padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none;
   }
-
   .log-header h3 { font-size: 13px; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
-
   .log-count { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 7px; border-radius: 10px; background: var(--glow-blue); color: var(--accent-blue); }
-
-  .log-body {
-    max-height: 200px; overflow-y: auto; padding: 8px;
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.7;
-  }
-
+  .log-body { max-height: 200px; overflow-y: auto; padding: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.7; }
   .log-body.collapsed { display: none; }
-
   .log-entry { padding: 2px 8px; border-radius: 4px; display: flex; gap: 10px; }
   .log-entry:hover { background: var(--bg-card); }
   .log-time { color: var(--text-muted); white-space: nowrap; }
@@ -333,31 +305,28 @@
   .log-dir.err { color: var(--accent-red); }
   .log-msg { color: var(--text-secondary); word-break: break-all; }
 
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-  .fade-in { animation: fadeIn 0.3s ease-out; }
-
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-  .sending .status-dot { animation: pulse 0.6s infinite; background: var(--accent-blue); }
-
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+  .toggle-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .toggle-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent-cyan); cursor: pointer; }
+  .toggle-row label { margin: 0; font-size: 12px; font-weight: 500; color: var(--text-secondary); cursor: pointer; }
+  .offset-hint { font-size: 10px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
+  .offset-hint b { color: var(--accent-cyan); }
 
   .api-note {
     font-size: 11px; color: var(--text-muted);
     background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.15);
     border-radius: 8px; padding: 10px 14px; line-height: 1.5;
   }
-
   .api-note strong { color: var(--accent-amber); }
 
-  .toggle-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-  .toggle-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent-cyan); cursor: pointer; }
-  .toggle-row label { margin: 0; font-size: 12px; font-weight: 500; color: var(--text-secondary); cursor: pointer; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fadeIn 0.3s ease-out; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .sending .status-dot { animation: pulse 0.6s infinite; background: var(--accent-blue); }
 
-  .offset-hint { font-size: 10px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
-  .offset-hint b { color: var(--accent-cyan); }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
   @media (max-width: 900px) {
     .main { grid-template-columns: 1fr; }
@@ -380,7 +349,6 @@
 
   <div class="main">
     <div class="sidebar">
-      <!-- Serial Port Config -->
       <div class="card">
         <div class="card-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24"/></svg>
@@ -389,82 +357,42 @@
         <div class="form-group">
           <label>Baud Rate</label>
           <select id="baudRate">
-            <option value="1200">1200</option>
-            <option value="2400">2400</option>
-            <option value="4800">4800</option>
-            <option value="9600" selected>9600</option>
-            <option value="19200">19200</option>
-            <option value="38400">38400</option>
-            <option value="57600">57600</option>
-            <option value="115200">115200</option>
+            <option value="1200">1200</option><option value="2400">2400</option><option value="4800">4800</option>
+            <option value="9600" selected>9600</option><option value="19200">19200</option><option value="38400">38400</option>
+            <option value="57600">57600</option><option value="115200">115200</option>
           </select>
         </div>
         <div class="row-2">
-          <div class="form-group">
-            <label>Data Bits</label>
-            <select id="dataBits">
-              <option value="7">7</option>
-              <option value="8" selected>8</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Stop Bits</label>
-            <select id="stopBits">
-              <option value="1" selected>1</option>
-              <option value="2">2</option>
-            </select>
-          </div>
+          <div class="form-group"><label>Data Bits</label><select id="dataBits"><option value="7">7</option><option value="8" selected>8</option></select></div>
+          <div class="form-group"><label>Stop Bits</label><select id="stopBits"><option value="1" selected>1</option><option value="2">2</option></select></div>
         </div>
         <div class="row-2">
-          <div class="form-group">
-            <label>Parity</label>
-            <select id="parity">
-              <option value="none" selected>None</option>
-              <option value="even">Even</option>
-              <option value="odd">Odd</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Timeout (ms)</label>
-            <input type="number" id="timeout" value="1000" min="100" max="10000" step="100">
-          </div>
+          <div class="form-group"><label>Parity</label><select id="parity"><option value="none" selected>None</option><option value="even">Even</option><option value="odd">Odd</option></select></div>
+          <div class="form-group"><label>Timeout (ms)</label><input type="number" id="timeout" value="1000" min="100" max="10000" step="100"></div>
         </div>
-        <div class="btn-row" style="margin-top: 14px;">
+        <div class="btn-row" style="margin-top:14px;">
           <button class="btn btn-primary" id="btnConnect" onclick="toggleConnection()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            Connect
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg> Connect
           </button>
           <button class="btn btn-danger" id="btnDisconnect" onclick="disconnect()" style="display:none;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-            Disconnect
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> Disconnect
           </button>
         </div>
       </div>
 
-      <!-- Slave Configuration -->
       <div class="card">
         <div class="card-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h4"/></svg>
           Slave Configuration
         </div>
         <div class="row-2">
-          <div class="form-group">
-            <label>Slave ID (1-247)</label>
-            <input type="number" id="slaveId" value="1" min="1" max="247">
-          </div>
-          <div class="form-group">
-            <label>Start Address</label>
-            <input type="number" id="startAddr" value="0" min="0" max="65535" oninput="updateWirePreview()">
-          </div>
+          <div class="form-group"><label>Slave ID (1-247)</label><input type="number" id="slaveId" value="1" min="1" max="247"></div>
+          <div class="form-group"><label>Start Address</label><input type="number" id="startAddr" value="0" min="0" max="65535" oninput="updateWirePreview()"></div>
         </div>
-        <div class="form-group">
-          <label>Quantity</label>
-          <input type="number" id="quantity" value="10" min="1" max="125">
-        </div>
+        <div class="form-group"><label>Quantity</label><input type="number" id="quantity" value="10" min="1" max="125"></div>
         <div class="wire-addr-preview" id="wireAddrPreview"></div>
       </div>
 
-      <!-- Minus Offset -->
       <div class="card">
         <div class="card-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><circle cx="12" cy="12" r="10"/></svg>
@@ -474,44 +402,29 @@
           <input type="checkbox" id="minusOffsetEnabled" onchange="updateOffsetUI()">
           <label for="minusOffsetEnabled">Enable Minus Offset</label>
         </div>
-        <div class="form-group">
-          <label>Offset Value</label>
-          <input type="number" id="minusOffset" value="0" min="0" max="65535" oninput="updateOffsetUI()">
-        </div>
+        <div class="form-group"><label>Offset Value</label><input type="number" id="minusOffset" value="0" min="0" max="65535" oninput="updateOffsetUI()"></div>
         <div class="offset-hint">
           Subtracts from the start address before sending on the wire.<br>
-          e.g. Start Addr <b>10001</b>, Offset <b>10001</b> → Wire Addr <b>0</b><br>
-          e.g. Start Addr <b>40001</b>, Offset <b>40001</b> → Wire Addr <b>0</b><br>
-          The <em>display</em> still shows your original address.
+          e.g. Start <b>10001</b>, Offset <b>10001</b> → Wire <b>0</b>
         </div>
       </div>
 
-      <!-- Polling -->
       <div class="card">
         <div class="card-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           Auto-Polling
         </div>
         <div class="row-2">
-          <div class="form-group">
-            <label>Interval (ms)</label>
-            <input type="number" id="pollInterval" value="1000" min="100" max="60000" step="100">
-          </div>
+          <div class="form-group"><label>Interval (ms)</label><input type="number" id="pollInterval" value="1000" min="100" max="60000" step="100"></div>
           <div class="form-group" style="display:flex;align-items:flex-end;">
-            <button class="btn btn-secondary" id="btnPoll" onclick="togglePolling()" style="width:100%;">
-              Start Polling
-            </button>
+            <button class="btn btn-secondary" id="btnPoll" onclick="togglePolling()" style="width:100%;">Start Polling</button>
           </div>
         </div>
       </div>
 
-      <div class="api-note">
-        <strong>⚡ Web Serial API</strong><br>
-        Requires Chrome/Edge 89+. Click <strong>Connect</strong> to select your serial port.
-      </div>
+      <div class="api-note"><strong>⚡ Web Serial API</strong><br>Requires Chrome/Edge 89+. Click <strong>Connect</strong> to select your serial port.</div>
     </div>
 
-    <!-- Content -->
     <div class="content">
       <div class="fc-tabs">
         <button class="fc-tab active" onclick="setFC(1, this)">FC01 Read Coils</button>
@@ -526,30 +439,20 @@
 
       <div class="query-panel">
         <div class="panel-header">
-          <h3>
-            <span id="fcName">Read Coils</span>
-            <span class="fc-badge" id="fcBadge">FC 01</span>
-          </h3>
+          <h3><span id="fcName">Read Coils</span><span class="fc-badge" id="fcBadge">FC 01</span></h3>
         </div>
-
         <div class="write-value-group" id="writeGroup" style="display:none;">
           <h4>Write Value(s)</h4>
-          <div class="form-group">
-            <label id="writeLabel">Value</label>
-            <input type="text" id="writeValue" placeholder="Enter value(s)...">
-          </div>
+          <div class="form-group"><label id="writeLabel">Value</label><input type="text" id="writeValue" placeholder="Enter value(s)..."></div>
           <div style="font-size:11px;color:var(--text-muted);margin-top:6px;" id="writeHint"></div>
         </div>
-
         <div class="send-btn-row">
           <button class="btn btn-primary" onclick="sendQuery()" style="max-width:200px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-            Send Query
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg> Send Query
           </button>
         </div>
       </div>
 
-      <!-- Response Area -->
       <div class="response-area">
         <div class="response-header">
           <h3>Response Data</h3>
@@ -561,16 +464,24 @@
           </div>
         </div>
 
-        <!-- Output Format Toggle Bar -->
-        <div class="output-format-bar" id="outputFormatBar">
-          <span class="format-label">Show:</span>
-          <div class="format-toggle">
-            <button class="format-btn active" onclick="toggleFormat('decimal', this)">DEC</button>
-            <button class="format-btn active" onclick="toggleFormat('hex', this)">HEX</button>
-            <button class="format-btn" onclick="toggleFormat('binary', this)">BIN</button>
-            <button class="format-btn" onclick="toggleFormat('signed', this)">SIGNED</button>
-            <button class="format-btn" onclick="toggleFormat('ascii', this)">ASCII</button>
-            <button class="format-btn" onclick="toggleFormat('float32', this)">FLOAT32</button>
+        <!-- Data Type Assignment Bar -->
+        <div class="dtype-bar" id="dtypeBar">
+          <div class="dtype-bar-header">
+            <h4>Data Type per Register</h4>
+            <div class="dtype-bar-actions">
+              <button class="secondary-action" onclick="copyFirstToAll()" title="Copy first register's type to all">Copy #1 → All</button>
+              <button onclick="reRender()">Apply</button>
+            </div>
+          </div>
+          <div class="dtype-grid" id="dtypeGrid"></div>
+          <div class="byte-order-row">
+            <label>Byte Order:</label>
+            <select id="byteOrder" onchange="reRender()">
+              <option value="AB" selected>Big-Endian (AB CD)</option>
+              <option value="BA">Little-Endian (BA DC)</option>
+              <option value="CDAB">Mid-Big (CD AB)</option>
+              <option value="DCBA">Mid-Little (DC BA)</option>
+            </select>
           </div>
         </div>
 
@@ -580,13 +491,14 @@
             <p>No data yet</p>
             <small>Connect to a serial port and send a Modbus query to see results.</small>
           </div>
-          <table id="responseTable" style="display:none;">
-            <thead id="tableHead"></thead>
-            <tbody id="tableBody"></tbody>
-          </table>
+          <div class="response-table-inner">
+            <table id="responseTable" style="display:none;">
+              <thead id="tableHead"></thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
         </div>
 
-        <!-- Raw Frame Display -->
         <div class="raw-frame-panel" id="rawFramePanel">
           <div class="raw-label">Raw Response Frame</div>
           <div class="raw-row"><span class="raw-tag">HEX</span><span class="raw-hex-data" id="rawHex"></span></div>
@@ -595,13 +507,11 @@
         </div>
       </div>
 
-      <!-- Log Panel -->
       <div class="log-panel">
         <div class="log-header" onclick="toggleLog()">
           <h3>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
-            Communication Log
-            <span class="log-count" id="logCount">0</span>
+            Communication Log <span class="log-count" id="logCount">0</span>
           </h3>
           <button class="btn btn-secondary" style="width:auto;padding:4px 10px;font-size:11px;" onclick="event.stopPropagation();clearLog();">Clear</button>
         </div>
@@ -612,598 +522,567 @@
 </div>
 
 <script>
-  // ─── State ──────────────────────────────────────────────
-  let port = null;
-  let reader = null;
-  let writer = null;
-  let connected = false;
-  let currentFC = 1;
-  let pollingTimer = null;
-  let isPolling = false;
-  let logEntries = 0;
-  let logCollapsed = false;
+// ─── State ────────────────────────────────────────────────
+let port = null, reader = null, writer = null, connected = false;
+let currentFC = 1, pollingTimer = null, isPolling = false;
+let logEntries = 0, logCollapsed = false;
+let lastResponse = null;
 
-  // Output format column visibility
-  let outputFormats = {
-    decimal: true, hex: true, binary: false,
-    signed: false, ascii: false, float32: false,
-  };
+// Per-register data types. Key = register index, Value = type string
+let registerTypes = {};
 
-  // Cache last response for re-render on format change
-  let lastResponse = null;
+// ─── Data Type Definitions ───────────────────────────────
+// Each type: { label, regSpan (how many 16-bit regs it consumes), decode(regs, byteOrder) }
+const DATA_TYPES = {
+  'int8':     { label: '8-bit INT',     regSpan: 1 },
+  'int16':    { label: '16-bit INT',    regSpan: 1 },
+  'int32':    { label: '32-bit INT',    regSpan: 2 },
+  'uint8':    { label: '8-bit UINT',    regSpan: 1 },
+  'uint16':   { label: '16-bit UINT',   regSpan: 1 },
+  'uint32':   { label: '32-bit UINT',   regSpan: 2 },
+  'uint64':   { label: '64-bit UINT',   regSpan: 4 },
+  'float32':  { label: '32-bit Float',  regSpan: 2 },
+  'float64':  { label: '64-bit Float',  regSpan: 4 },
+  'string4':  { label: 'String4 (32b)', regSpan: 2 },
+  'string6':  { label: 'String6 (48b)', regSpan: 3 },
+  'string8':  { label: 'String8 (64b)', regSpan: 4 },
+  'string12': { label: 'String12',      regSpan: 6 },
+  'string16': { label: 'String16',      regSpan: 8 },
+};
 
-  // ─── CRC16 Modbus ──────────────────────────────────────
-  function crc16(buffer) {
-    let crc = 0xFFFF;
-    for (let i = 0; i < buffer.length; i++) {
-      crc ^= buffer[i];
-      for (let j = 0; j < 8; j++) {
-        if (crc & 1) crc = (crc >> 1) ^ 0xA001;
-        else crc >>= 1;
+function getByteOrder() {
+  return document.getElementById('byteOrder').value;
+}
+
+// Reorder bytes from register array based on byte order setting
+function reorderBytes(regs, byteOrder) {
+  // regs is array of 16-bit values; build raw byte array first (big-endian per register)
+  const bytes = [];
+  for (const r of regs) {
+    bytes.push((r >> 8) & 0xFF, r & 0xFF);
+  }
+  const len = bytes.length;
+  if (byteOrder === 'AB') return bytes; // already big-endian
+  if (byteOrder === 'BA') {
+    // swap each pair
+    const out = [];
+    for (let i = 0; i < len; i += 2) out.push(bytes[i+1], bytes[i]);
+    return out;
+  }
+  if (byteOrder === 'CDAB') {
+    // word-swap: swap 16-bit word pairs
+    const out = [...bytes];
+    for (let i = 0; i + 3 < len; i += 4) {
+      [out[i], out[i+1], out[i+2], out[i+3]] = [out[i+2], out[i+3], out[i], out[i+1]];
+    }
+    return out;
+  }
+  if (byteOrder === 'DCBA') {
+    // full reverse in 4-byte groups
+    const out = [...bytes];
+    for (let i = 0; i + 3 < len; i += 4) {
+      [out[i], out[i+1], out[i+2], out[i+3]] = [out[i+3], out[i+2], out[i+1], out[i]];
+    }
+    return out;
+  }
+  return bytes;
+}
+
+function decodeValue(type, regs, byteOrder) {
+  const def = DATA_TYPES[type];
+  if (!def) return '?';
+  const needed = def.regSpan;
+  if (regs.length < needed) return 'N/A (need ' + needed + ' regs)';
+
+  const bytes = reorderBytes(regs.slice(0, needed), byteOrder);
+  const buf = new ArrayBuffer(bytes.length);
+  const view = new DataView(buf);
+  for (let i = 0; i < bytes.length; i++) view.setUint8(i, bytes[i]);
+
+  switch (type) {
+    case 'int8':    return view.getInt8(0).toString();
+    case 'int16':   return view.getInt16(0).toString();
+    case 'int32':   return view.getInt32(0).toString();
+    case 'uint8':   return view.getUint8(0).toString();
+    case 'uint16':  return view.getUint16(0).toString();
+    case 'uint32':  return view.getUint32(0).toString();
+    case 'uint64': {
+      const hi = BigInt(view.getUint32(0)) << 32n;
+      const lo = BigInt(view.getUint32(4));
+      return (hi | lo).toString();
+    }
+    case 'float32': {
+      const f = view.getFloat32(0);
+      return (isNaN(f) || !isFinite(f)) ? 'NaN/Inf' : f.toPrecision(7);
+    }
+    case 'float64': {
+      const f = view.getFloat64(0);
+      return (isNaN(f) || !isFinite(f)) ? 'NaN/Inf' : f.toPrecision(10);
+    }
+    case 'string4':
+    case 'string6':
+    case 'string8':
+    case 'string12':
+    case 'string16': {
+      let s = '';
+      for (let i = 0; i < bytes.length; i++) {
+        const b = bytes[i];
+        s += (b >= 32 && b <= 126) ? String.fromCharCode(b) : (b === 0 ? '' : '·');
       }
+      return '"' + s + '"';
     }
-    return crc;
+    default: return '?';
   }
+}
 
-  function appendCRC(frame) {
-    const crc = crc16(frame);
-    const full = new Uint8Array(frame.length + 2);
-    full.set(frame);
-    full[frame.length] = crc & 0xFF;
-    full[frame.length + 1] = (crc >> 8) & 0xFF;
-    return full;
-  }
-
-  function verifyCRC(data) {
-    if (data.length < 4) return false;
-    const payload = data.slice(0, data.length - 2);
-    const received = data[data.length - 2] | (data[data.length - 1] << 8);
-    return crc16(payload) === received;
-  }
-
-  // ─── Minus Offset ──────────────────────────────────────
-  // Returns the wire address = startAddr - offset (when enabled)
-  function getWireAddress(startAddr) {
-    const enabled = document.getElementById('minusOffsetEnabled').checked;
-    if (!enabled) return startAddr;
-    const offset = parseInt(document.getElementById('minusOffset').value) || 0;
-    const wire = startAddr - offset;
-    return Math.max(0, Math.min(65535, wire));
-  }
-
-  function updateOffsetUI() {
-    const enabled = document.getElementById('minusOffsetEnabled').checked;
-    const offset = parseInt(document.getElementById('minusOffset').value) || 0;
-    const indicator = document.getElementById('offsetIndicator');
-    const display = document.getElementById('offsetDisplay');
-    if (enabled && offset !== 0) {
-      indicator.classList.add('visible');
-      display.textContent = '−' + offset;
-    } else {
-      indicator.classList.remove('visible');
-    }
-    updateWirePreview();
-  }
-
-  function updateWirePreview() {
-    const enabled = document.getElementById('minusOffsetEnabled').checked;
-    const preview = document.getElementById('wireAddrPreview');
-    if (!enabled) {
-      preview.classList.remove('visible');
-      return;
-    }
-    const startAddr = parseInt(document.getElementById('startAddr').value) || 0;
-    const wireAddr = getWireAddress(startAddr);
-    preview.classList.add('visible');
-    preview.innerHTML = `Display: <b>${startAddr}</b> → Wire: <b>${wireAddr}</b> (0x${wireAddr.toString(16).toUpperCase().padStart(4, '0')})`;
-  }
-
-  // ─── Frame Builders ────────────────────────────────────
-  function buildReadFrame(slaveId, fc, wireAddr, quantity) {
-    const frame = new Uint8Array(6);
-    frame[0] = slaveId;
-    frame[1] = fc;
-    frame[2] = (wireAddr >> 8) & 0xFF;
-    frame[3] = wireAddr & 0xFF;
-    frame[4] = (quantity >> 8) & 0xFF;
-    frame[5] = quantity & 0xFF;
-    return appendCRC(frame);
-  }
-
-  function buildWriteSingleCoilFrame(slaveId, wireAddr, value) {
-    const frame = new Uint8Array(6);
-    frame[0] = slaveId;
-    frame[1] = 5;
-    frame[2] = (wireAddr >> 8) & 0xFF;
-    frame[3] = wireAddr & 0xFF;
-    frame[4] = value ? 0xFF : 0x00;
-    frame[5] = 0x00;
-    return appendCRC(frame);
-  }
-
-  function buildWriteSingleRegFrame(slaveId, wireAddr, value) {
-    const frame = new Uint8Array(6);
-    frame[0] = slaveId;
-    frame[1] = 6;
-    frame[2] = (wireAddr >> 8) & 0xFF;
-    frame[3] = wireAddr & 0xFF;
-    frame[4] = (value >> 8) & 0xFF;
-    frame[5] = value & 0xFF;
-    return appendCRC(frame);
-  }
-
-  function buildWriteMultipleCoilsFrame(slaveId, wireAddr, values) {
-    const qty = values.length;
-    const byteCount = Math.ceil(qty / 8);
-    const frame = new Uint8Array(7 + byteCount);
-    frame[0] = slaveId;
-    frame[1] = 15;
-    frame[2] = (wireAddr >> 8) & 0xFF;
-    frame[3] = wireAddr & 0xFF;
-    frame[4] = (qty >> 8) & 0xFF;
-    frame[5] = qty & 0xFF;
-    frame[6] = byteCount;
-    for (let i = 0; i < qty; i++) {
-      if (values[i]) frame[7 + Math.floor(i / 8)] |= (1 << (i % 8));
-    }
-    return appendCRC(frame);
-  }
-
-  function buildWriteMultipleRegsFrame(slaveId, wireAddr, values) {
-    const qty = values.length;
-    const byteCount = qty * 2;
-    const frame = new Uint8Array(7 + byteCount);
-    frame[0] = slaveId;
-    frame[1] = 16;
-    frame[2] = (wireAddr >> 8) & 0xFF;
-    frame[3] = wireAddr & 0xFF;
-    frame[4] = (qty >> 8) & 0xFF;
-    frame[5] = qty & 0xFF;
-    frame[6] = byteCount;
-    for (let i = 0; i < qty; i++) {
-      frame[7 + i * 2] = (values[i] >> 8) & 0xFF;
-      frame[8 + i * 2] = values[i] & 0xFF;
-    }
-    return appendCRC(frame);
-  }
-
-  // ─── Serial Connection ─────────────────────────────────
-  async function toggleConnection() {
-    if (connected) return;
-    try {
-      if (!('serial' in navigator)) {
-        addLog('err', 'Web Serial API not supported. Use Chrome/Edge 89+.');
-        alert('Web Serial API not supported. Please use Chrome or Edge 89+.');
-        return;
-      }
-      port = await navigator.serial.requestPort();
-      const baudRate = parseInt(document.getElementById('baudRate').value);
-      const dataBits = parseInt(document.getElementById('dataBits').value);
-      const stopBits = parseInt(document.getElementById('stopBits').value);
-      const parity = document.getElementById('parity').value;
-
-      await port.open({ baudRate, dataBits, stopBits, parity });
-      writer = port.writable.getWriter();
-      connected = true;
-      updateConnectionUI(true);
-      addLog('tx', `Connected @ ${baudRate} ${dataBits}${parity[0].toUpperCase()}${stopBits}`);
-    } catch (err) {
-      addLog('err', `Connection failed: ${err.message}`);
+// ─── CRC16 Modbus ────────────────────────────────────────
+function crc16(buffer) {
+  let crc = 0xFFFF;
+  for (let i = 0; i < buffer.length; i++) {
+    crc ^= buffer[i];
+    for (let j = 0; j < 8; j++) {
+      if (crc & 1) crc = (crc >> 1) ^ 0xA001;
+      else crc >>= 1;
     }
   }
+  return crc;
+}
 
-  async function disconnect() {
-    try {
-      if (isPolling) togglePolling();
-      if (writer) { writer.releaseLock(); writer = null; }
-      if (port) { await port.close(); port = null; }
-      connected = false;
-      updateConnectionUI(false);
-      addLog('err', 'Disconnected');
-    } catch (err) {
-      addLog('err', `Disconnect error: ${err.message}`);
-      connected = false;
-      updateConnectionUI(false);
-    }
+function appendCRC(frame) {
+  const crc = crc16(frame);
+  const full = new Uint8Array(frame.length + 2);
+  full.set(frame);
+  full[frame.length] = crc & 0xFF;
+  full[frame.length + 1] = (crc >> 8) & 0xFF;
+  return full;
+}
+
+function verifyCRC(data) {
+  if (data.length < 4) return false;
+  const payload = data.slice(0, data.length - 2);
+  const received = data[data.length - 2] | (data[data.length - 1] << 8);
+  return crc16(payload) === received;
+}
+
+// ─── Minus Offset ────────────────────────────────────────
+function getWireAddress(startAddr) {
+  const enabled = document.getElementById('minusOffsetEnabled').checked;
+  if (!enabled) return startAddr;
+  const offset = parseInt(document.getElementById('minusOffset').value) || 0;
+  return Math.max(0, Math.min(65535, startAddr - offset));
+}
+
+function updateOffsetUI() {
+  const enabled = document.getElementById('minusOffsetEnabled').checked;
+  const offset = parseInt(document.getElementById('minusOffset').value) || 0;
+  const indicator = document.getElementById('offsetIndicator');
+  const display = document.getElementById('offsetDisplay');
+  if (enabled && offset !== 0) {
+    indicator.classList.add('visible');
+    display.textContent = '−' + offset;
+  } else {
+    indicator.classList.remove('visible');
   }
+  updateWirePreview();
+}
 
-  function updateConnectionUI(isConnected) {
-    const dot = document.getElementById('statusDot');
-    const text = document.getElementById('statusText');
-    const btnC = document.getElementById('btnConnect');
-    const btnD = document.getElementById('btnDisconnect');
-    if (isConnected) {
-      dot.classList.add('connected'); text.textContent = 'Connected';
-      btnC.style.display = 'none'; btnD.style.display = 'flex';
-    } else {
-      dot.classList.remove('connected'); text.textContent = 'Disconnected';
-      btnC.style.display = 'flex'; btnD.style.display = 'none';
-    }
-  }
+function updateWirePreview() {
+  const enabled = document.getElementById('minusOffsetEnabled').checked;
+  const preview = document.getElementById('wireAddrPreview');
+  if (!enabled) { preview.classList.remove('visible'); return; }
+  const startAddr = parseInt(document.getElementById('startAddr').value) || 0;
+  const wireAddr = getWireAddress(startAddr);
+  preview.classList.add('visible');
+  preview.innerHTML = `Display: <b>${startAddr}</b> → Wire: <b>${wireAddr}</b> (0x${wireAddr.toString(16).toUpperCase().padStart(4, '0')})`;
+}
 
-  // ─── Read Response ─────────────────────────────────────
-  async function readResponse(expectedMinLen) {
-    const timeout = parseInt(document.getElementById('timeout').value) || 1000;
-    const buffer = [];
-    const readableStream = port.readable;
-    const tempReader = readableStream.getReader();
-    let done = false;
-    const timer = setTimeout(() => { done = true; }, timeout);
-    try {
-      while (!done) {
-        const { value, done: streamDone } = await Promise.race([
+// ─── Frame Builders ──────────────────────────────────────
+function buildReadFrame(slaveId, fc, wireAddr, quantity) {
+  const f = new Uint8Array(6);
+  f[0]=slaveId; f[1]=fc;
+  f[2]=(wireAddr>>8)&0xFF; f[3]=wireAddr&0xFF;
+  f[4]=(quantity>>8)&0xFF; f[5]=quantity&0xFF;
+  return appendCRC(f);
+}
+
+function buildWriteSingleCoilFrame(slaveId, wireAddr, value) {
+  const f = new Uint8Array(6);
+  f[0]=slaveId; f[1]=5;
+  f[2]=(wireAddr>>8)&0xFF; f[3]=wireAddr&0xFF;
+  f[4]=value?0xFF:0x00; f[5]=0x00;
+  return appendCRC(f);
+}
+
+function buildWriteSingleRegFrame(slaveId, wireAddr, value) {
+  const f = new Uint8Array(6);
+  f[0]=slaveId; f[1]=6;
+  f[2]=(wireAddr>>8)&0xFF; f[3]=wireAddr&0xFF;
+  f[4]=(value>>8)&0xFF; f[5]=value&0xFF;
+  return appendCRC(f);
+}
+
+function buildWriteMultipleCoilsFrame(slaveId, wireAddr, values) {
+  const qty = values.length, byteCount = Math.ceil(qty / 8);
+  const f = new Uint8Array(7 + byteCount);
+  f[0]=slaveId; f[1]=15;
+  f[2]=(wireAddr>>8)&0xFF; f[3]=wireAddr&0xFF;
+  f[4]=(qty>>8)&0xFF; f[5]=qty&0xFF; f[6]=byteCount;
+  for (let i=0; i<qty; i++) { if (values[i]) f[7+Math.floor(i/8)] |= (1<<(i%8)); }
+  return appendCRC(f);
+}
+
+function buildWriteMultipleRegsFrame(slaveId, wireAddr, values) {
+  const qty = values.length, byteCount = qty * 2;
+  const f = new Uint8Array(7 + byteCount);
+  f[0]=slaveId; f[1]=16;
+  f[2]=(wireAddr>>8)&0xFF; f[3]=wireAddr&0xFF;
+  f[4]=(qty>>8)&0xFF; f[5]=qty&0xFF; f[6]=byteCount;
+  for (let i=0; i<qty; i++) { f[7+i*2]=(values[i]>>8)&0xFF; f[8+i*2]=values[i]&0xFF; }
+  return appendCRC(f);
+}
+
+// ─── Serial Connection ───────────────────────────────────
+async function toggleConnection() {
+  if (connected) return;
+  try {
+    if (!('serial' in navigator)) { addLog('err','Web Serial API not supported.'); alert('Web Serial API not supported.'); return; }
+    port = await navigator.serial.requestPort();
+    const baudRate = parseInt(document.getElementById('baudRate').value);
+    const dataBits = parseInt(document.getElementById('dataBits').value);
+    const stopBits = parseInt(document.getElementById('stopBits').value);
+    const parity = document.getElementById('parity').value;
+    await port.open({ baudRate, dataBits, stopBits, parity });
+    writer = port.writable.getWriter();
+    connected = true;
+    updateConnectionUI(true);
+    addLog('tx', `Connected @ ${baudRate} ${dataBits}${parity[0].toUpperCase()}${stopBits}`);
+  } catch (err) { addLog('err', `Connection failed: ${err.message}`); }
+}
+
+async function disconnect() {
+  try {
+    if (isPolling) togglePolling();
+    if (writer) { writer.releaseLock(); writer = null; }
+    if (port) { await port.close(); port = null; }
+    connected = false; updateConnectionUI(false); addLog('err', 'Disconnected');
+  } catch (err) { addLog('err', `Disconnect error: ${err.message}`); connected = false; updateConnectionUI(false); }
+}
+
+function updateConnectionUI(c) {
+  const dot = document.getElementById('statusDot'), text = document.getElementById('statusText');
+  const btnC = document.getElementById('btnConnect'), btnD = document.getElementById('btnDisconnect');
+  if (c) { dot.classList.add('connected'); text.textContent='Connected'; btnC.style.display='none'; btnD.style.display='flex'; }
+  else { dot.classList.remove('connected'); text.textContent='Disconnected'; btnC.style.display='flex'; btnD.style.display='none'; }
+}
+
+// ─── Read Response ───────────────────────────────────────
+async function readResponse(expectedMinLen) {
+  const timeout = parseInt(document.getElementById('timeout').value) || 1000;
+  const buffer = [];
+  const tempReader = port.readable.getReader();
+  let done = false;
+  const timer = setTimeout(() => { done = true; }, timeout);
+  try {
+    while (!done) {
+      const { value, done: streamDone } = await Promise.race([
+        tempReader.read(),
+        new Promise(r => setTimeout(() => r({ value: null, done: true }), timeout))
+      ]);
+      if (streamDone || value === null) break;
+      buffer.push(...value);
+      if (buffer.length >= expectedMinLen) {
+        await new Promise(r => setTimeout(r, 50));
+        const { value: extra } = await Promise.race([
           tempReader.read(),
-          new Promise(resolve => setTimeout(() => resolve({ value: null, done: true }), timeout))
+          new Promise(r => setTimeout(() => r({ value: null, done: true }), 80))
         ]);
-        if (streamDone || value === null) break;
-        buffer.push(...value);
-        if (buffer.length >= expectedMinLen) {
-          await new Promise(r => setTimeout(r, 50));
-          const { value: extra } = await Promise.race([
-            tempReader.read(),
-            new Promise(r => setTimeout(() => r({ value: null, done: true }), 80))
-          ]);
-          if (extra) buffer.push(...extra);
-          break;
-        }
+        if (extra) buffer.push(...extra);
+        break;
       }
-    } finally {
-      clearTimeout(timer);
-      tempReader.releaseLock();
     }
-    return new Uint8Array(buffer);
-  }
+  } finally { clearTimeout(timer); tempReader.releaseLock(); }
+  return new Uint8Array(buffer);
+}
 
-  // ─── Output Format Toggle ─────────────────────────────
-  function toggleFormat(format, btnEl) {
-    outputFormats[format] = !outputFormats[format];
-    btnEl.classList.toggle('active', outputFormats[format]);
-    if (lastResponse) {
-      displayResponse(lastResponse.fc, lastResponse.data, lastResponse.displayStartAddr, lastResponse.quantity, lastResponse.elapsed);
+// ─── Data Type Grid ──────────────────────────────────────
+function buildDtypeGrid(regCount, displayStartAddr) {
+  const grid = document.getElementById('dtypeGrid');
+  const bar = document.getElementById('dtypeBar');
+  grid.innerHTML = '';
+  bar.classList.add('visible');
+
+  const typeOptions = Object.entries(DATA_TYPES).map(([k,v]) =>
+    `<option value="${k}">${v.label}</option>`
+  ).join('');
+
+  for (let i = 0; i < regCount; i++) {
+    const addr = displayStartAddr + i;
+    const current = registerTypes[i] || 'uint16';
+    const div = document.createElement('div');
+    div.className = 'dtype-item';
+    div.innerHTML = `
+      <span class="dtype-addr">${addr}</span>
+      <select data-reg="${i}" onchange="registerTypes[${i}]=this.value; reRender();">
+        ${typeOptions}
+      </select>
+    `;
+    const sel = div.querySelector('select');
+    sel.value = current;
+    if (!registerTypes[i]) registerTypes[i] = 'uint16';
+    grid.appendChild(div);
+  }
+}
+
+function copyFirstToAll() {
+  const firstType = registerTypes[0] || 'uint16';
+  const regCount = lastResponse ? (lastResponse.regValues ? lastResponse.regValues.length : 0) : 0;
+  for (let i = 0; i < regCount; i++) registerTypes[i] = firstType;
+  // Update all selects
+  document.querySelectorAll('#dtypeGrid select').forEach(sel => { sel.value = firstType; });
+  reRender();
+}
+
+function reRender() {
+  if (lastResponse && (lastResponse.fc === 3 || lastResponse.fc === 4)) {
+    displayResponse(lastResponse.fc, lastResponse.data, lastResponse.displayStartAddr, lastResponse.quantity, lastResponse.elapsed);
+  }
+}
+
+// ─── Send Query ──────────────────────────────────────────
+async function sendQuery() {
+  if (!connected) { addLog('err', 'Not connected.'); return; }
+  const slaveId = parseInt(document.getElementById('slaveId').value);
+  const displayStartAddr = parseInt(document.getElementById('startAddr').value);
+  const wireAddr = getWireAddress(displayStartAddr);
+  const quantity = parseInt(document.getElementById('quantity').value);
+  const fc = currentFC;
+  let frame, expectedMinLen;
+
+  try {
+    if (fc===1||fc===2) { frame=buildReadFrame(slaveId,fc,wireAddr,quantity); expectedMinLen=5+Math.ceil(quantity/8); }
+    else if (fc===3||fc===4) { frame=buildReadFrame(slaveId,fc,wireAddr,quantity); expectedMinLen=5+quantity*2; }
+    else if (fc===5) {
+      const val=document.getElementById('writeValue').value.trim();
+      frame=buildWriteSingleCoilFrame(slaveId,wireAddr,val==='1'||val.toLowerCase()==='true'||val==='on'||val==='ff00');
+      expectedMinLen=8;
+    } else if (fc===6) {
+      const val=parseInt(document.getElementById('writeValue').value.trim());
+      if (isNaN(val)||val<0||val>65535) { addLog('err','Invalid register value (0-65535)'); return; }
+      frame=buildWriteSingleRegFrame(slaveId,wireAddr,val); expectedMinLen=8;
+    } else if (fc===15) {
+      const vals=document.getElementById('writeValue').value.trim().split(/[\s,]+/).map(v=>v==='1'||v.toLowerCase()==='true');
+      frame=buildWriteMultipleCoilsFrame(slaveId,wireAddr,vals); expectedMinLen=8;
+    } else if (fc===16) {
+      const vals=document.getElementById('writeValue').value.trim().split(/[\s,]+/).map(v=>parseInt(v));
+      if (vals.some(v=>isNaN(v))) { addLog('err','Invalid register values'); return; }
+      frame=buildWriteMultipleRegsFrame(slaveId,wireAddr,vals); expectedMinLen=8;
     }
-  }
 
-  // ─── Conversion Helpers ────────────────────────────────
-  function toAsciiChar(val) {
-    const hi = (val >> 8) & 0xFF;
-    const lo = val & 0xFF;
-    const c = (b) => (b >= 32 && b <= 126) ? String.fromCharCode(b) : '·';
-    return c(hi) + c(lo);
-  }
+    const offsetEnabled=document.getElementById('minusOffsetEnabled').checked;
+    const addrInfo=offsetEnabled&&wireAddr!==displayStartAddr?`Addr=${displayStartAddr}→Wire=${wireAddr}`:`Addr=${wireAddr}`;
+    addLog('tx', `[${fcNames[fc]}] Slave=${slaveId} ${addrInfo} Qty=${quantity}  →  ${toHexStr(frame)}`);
 
-  function toFloat32(regA, regB) {
-    const buf = new ArrayBuffer(4);
-    const view = new DataView(buf);
-    view.setUint16(0, regA);
-    view.setUint16(2, regB);
-    return view.getFloat32(0);
-  }
+    const startTime = performance.now();
+    await writer.write(frame);
+    const response = await readResponse(expectedMinLen);
+    const elapsed = (performance.now() - startTime).toFixed(1);
 
-  function toRawBinStr(arr) {
-    return Array.from(arr).map(b => b.toString(2).padStart(8, '0')).join(' ');
-  }
-
-  function toRawAsciiStr(arr) {
-    return Array.from(arr).map(b => (b >= 32 && b <= 126) ? String.fromCharCode(b) : '·').join('');
-  }
-
-  function escapeHtml(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-
-  // ─── Send Query ────────────────────────────────────────
-  async function sendQuery() {
-    if (!connected) {
-      addLog('err', 'Not connected. Please connect to a serial port first.');
-      return;
+    if (response.length===0) { addLog('err','No response (timeout)'); return; }
+    addLog('rx', `${toHexStr(response)}  (${elapsed}ms, ${response.length} bytes)`);
+    if (!verifyCRC(response)) { addLog('err','CRC check failed!'); return; }
+    if (response[1]&0x80) {
+      const excCode=response[2];
+      const excNames={1:'Illegal Function',2:'Illegal Data Address',3:'Illegal Data Value',4:'Slave Device Failure'};
+      addLog('err',`Exception: ${excNames[excCode]||'Unknown'} (code ${excCode})`); return;
     }
 
-    const slaveId = parseInt(document.getElementById('slaveId').value);
-    const displayStartAddr = parseInt(document.getElementById('startAddr').value);
-    const wireAddr = getWireAddress(displayStartAddr);
-    const quantity = parseInt(document.getElementById('quantity').value);
-    const fc = currentFC;
-    let frame;
-    let expectedMinLen;
+    showRawFrame(response);
+    displayResponse(fc, response, displayStartAddr, quantity, elapsed);
+  } catch (err) { addLog('err', `Query error: ${err.message}`); }
+}
 
-    try {
-      if (fc === 1 || fc === 2) {
-        frame = buildReadFrame(slaveId, fc, wireAddr, quantity);
-        expectedMinLen = 5 + Math.ceil(quantity / 8);
-      } else if (fc === 3 || fc === 4) {
-        frame = buildReadFrame(slaveId, fc, wireAddr, quantity);
-        expectedMinLen = 5 + quantity * 2;
-      } else if (fc === 5) {
-        const val = document.getElementById('writeValue').value.trim();
-        frame = buildWriteSingleCoilFrame(slaveId, wireAddr, val === '1' || val.toLowerCase() === 'true' || val === 'on' || val === 'ff00');
-        expectedMinLen = 8;
-      } else if (fc === 6) {
-        const val = parseInt(document.getElementById('writeValue').value.trim());
-        if (isNaN(val) || val < 0 || val > 65535) { addLog('err', 'Invalid register value (0-65535)'); return; }
-        frame = buildWriteSingleRegFrame(slaveId, wireAddr, val);
-        expectedMinLen = 8;
-      } else if (fc === 15) {
-        const vals = document.getElementById('writeValue').value.trim().split(/[\s,]+/).map(v => v === '1' || v.toLowerCase() === 'true');
-        frame = buildWriteMultipleCoilsFrame(slaveId, wireAddr, vals);
-        expectedMinLen = 8;
-      } else if (fc === 16) {
-        const vals = document.getElementById('writeValue').value.trim().split(/[\s,]+/).map(v => parseInt(v));
-        if (vals.some(v => isNaN(v))) { addLog('err', 'Invalid register values'); return; }
-        frame = buildWriteMultipleRegsFrame(slaveId, wireAddr, vals);
-        expectedMinLen = 8;
-      }
+// ─── Raw Frame Display ───────────────────────────────────
+function showRawFrame(data) {
+  document.getElementById('rawFramePanel').style.display = 'block';
+  document.getElementById('rawHex').textContent = toHexStr(data);
+  document.getElementById('rawBin').textContent = Array.from(data).map(b=>b.toString(2).padStart(8,'0')).join(' ');
+  document.getElementById('rawAscii').textContent = Array.from(data).map(b=>(b>=32&&b<=126)?String.fromCharCode(b):'·').join('');
+}
 
-      // Log with both display and wire addresses when offset active
-      const offsetEnabled = document.getElementById('minusOffsetEnabled').checked;
-      const addrInfo = offsetEnabled && wireAddr !== displayStartAddr
-        ? `Addr=${displayStartAddr}→Wire=${wireAddr}`
-        : `Addr=${wireAddr}`;
-      addLog('tx', `[${fcNames[fc]}] Slave=${slaveId} ${addrInfo} Qty=${quantity}  →  ${toHexStr(frame)}`);
+// ─── Display Response ────────────────────────────────────
+function displayResponse(fc, data, displayStartAddr, quantity, elapsed) {
+  const meta=document.getElementById('responseMeta');
+  const table=document.getElementById('responseTable');
+  const empty=document.getElementById('emptyState');
+  const head=document.getElementById('tableHead');
+  const body=document.getElementById('tableBody');
+  const dtypeBar=document.getElementById('dtypeBar');
 
-      const startTime = performance.now();
-      await writer.write(frame);
-      const response = await readResponse(expectedMinLen);
-      const elapsed = (performance.now() - startTime).toFixed(1);
+  meta.style.display='flex';
+  document.getElementById('respTime').textContent=elapsed;
+  document.getElementById('respBytes').textContent=data.length;
+  document.getElementById('respSlave').textContent=data[0];
+  empty.style.display='none';
+  table.style.display='table';
+  body.innerHTML='';
 
-      if (response.length === 0) {
-        addLog('err', `No response (timeout)`);
-        return;
-      }
-
-      addLog('rx', `${toHexStr(response)}  (${elapsed}ms, ${response.length} bytes)`);
-
-      if (!verifyCRC(response)) {
-        addLog('err', 'CRC check failed!');
-        return;
-      }
-
-      if (response[1] & 0x80) {
-        const excCode = response[2];
-        const excNames = { 1: 'Illegal Function', 2: 'Illegal Data Address', 3: 'Illegal Data Value', 4: 'Slave Device Failure' };
-        addLog('err', `Exception: ${excNames[excCode] || 'Unknown'} (code ${excCode})`);
-        return;
-      }
-
-      showRawFrame(response);
-      displayResponse(fc, response, displayStartAddr, quantity, elapsed);
-
-    } catch (err) {
-      addLog('err', `Query error: ${err.message}`);
+  if (fc===1||fc===2) {
+    // ── Coil / Discrete ──
+    dtypeBar.classList.remove('visible');
+    head.innerHTML='<tr><th>Address</th><th>Value</th><th>State</th><th>Hex</th><th>Binary</th></tr>';
+    for (let i=0; i<quantity; i++) {
+      const val=(data[3+Math.floor(i/8)]>>(i%8))&1;
+      const tr=document.createElement('tr'); tr.className='fade-in'; tr.style.animationDelay=`${i*15}ms`;
+      tr.innerHTML=`
+        <td class="addr">${displayStartAddr+i}</td>
+        <td class="${val?'bool-true':'bool-false'}">${val}</td>
+        <td class="${val?'bool-true':'bool-false'}">${val?'ON':'OFF'}</td>
+        <td class="hex">0x${val.toString(16).toUpperCase().padStart(2,'0')}</td>
+        <td class="bin">${val.toString(2)}</td>`;
+      body.appendChild(tr);
     }
-  }
 
-  // ─── Raw Frame Display ─────────────────────────────────
-  function showRawFrame(data) {
-    const panel = document.getElementById('rawFramePanel');
-    panel.style.display = 'block';
-    document.getElementById('rawHex').textContent = toHexStr(data);
-    document.getElementById('rawBin').textContent = toRawBinStr(data);
-    document.getElementById('rawAscii').textContent = toRawAsciiStr(data);
-  }
+  } else if (fc===3||fc===4) {
+    // ── Registers ──
+    const byteCount=data[2], regCount=byteCount/2;
+    const regValues=[];
+    for (let i=0; i<regCount; i++) regValues.push((data[3+i*2]<<8)|data[4+i*2]);
 
-  // ─── Display Response ──────────────────────────────────
-  function displayResponse(fc, data, displayStartAddr, quantity, elapsed) {
     // Cache for re-render
-    lastResponse = { fc, data, displayStartAddr, quantity, elapsed };
+    lastResponse = { fc, data, displayStartAddr, quantity, elapsed, regValues };
 
-    const meta = document.getElementById('responseMeta');
-    const table = document.getElementById('responseTable');
-    const empty = document.getElementById('emptyState');
-    const head = document.getElementById('tableHead');
-    const body = document.getElementById('tableBody');
-    const formatBar = document.getElementById('outputFormatBar');
+    // Build dtype grid
+    buildDtypeGrid(regCount, displayStartAddr);
 
-    meta.style.display = 'flex';
-    document.getElementById('respTime').textContent = elapsed;
-    document.getElementById('respBytes').textContent = data.length;
-    document.getElementById('respSlave').textContent = data[0];
+    // Build table header
+    head.innerHTML='<tr><th>Address</th><th>Raw (U16)</th><th>Hex</th><th>Type</th><th>Interpreted Value</th></tr>';
 
-    empty.style.display = 'none';
-    table.style.display = 'table';
-    body.innerHTML = '';
+    const byteOrder = getByteOrder();
+    let i = 0;
+    while (i < regCount) {
+      const type = registerTypes[i] || 'uint16';
+      const def = DATA_TYPES[type];
+      const span = def ? def.regSpan : 1;
+      const availRegs = regValues.slice(i, i + span);
+      const decoded = decodeValue(type, availRegs, byteOrder);
 
-    if (fc === 1 || fc === 2) {
-      // ── Coil / Discrete Inputs ──
-      formatBar.style.display = 'none';
-      head.innerHTML = '<tr><th>Address</th><th>Value</th><th>State</th><th>Hex</th><th>Binary</th></tr>';
-      for (let i = 0; i < quantity; i++) {
-        const byteIdx = Math.floor(i / 8);
-        const bitIdx = i % 8;
-        const val = (data[3 + byteIdx] >> bitIdx) & 1;
-        const tr = document.createElement('tr');
-        tr.className = 'fade-in';
-        tr.style.animationDelay = `${i * 15}ms`;
-        tr.innerHTML = `
-          <td class="addr">${displayStartAddr + i}</td>
-          <td class="${val ? 'bool-true' : 'bool-false'}">${val}</td>
-          <td class="${val ? 'bool-true' : 'bool-false'}">${val ? 'ON' : 'OFF'}</td>
-          <td class="hex">0x${val.toString(16).toUpperCase().padStart(2, '0')}</td>
-          <td class="bin">${val.toString(2)}</td>
-        `;
-        body.appendChild(tr);
+      // First row of this group: show all info
+      const tr = document.createElement('tr');
+      tr.className = 'fade-in';
+      tr.style.animationDelay = `${i * 15}ms`;
+      const rawU16 = regValues[i];
+      tr.innerHTML = `
+        <td class="addr">${displayStartAddr + i}</td>
+        <td class="val">${rawU16}</td>
+        <td class="hex">0x${rawU16.toString(16).toUpperCase().padStart(4,'0')}</td>
+        <td>${def ? def.label : type}</td>
+        <td class="interpreted">${escapeHtml(decoded)}</td>`;
+      body.appendChild(tr);
+
+      // If multi-register type, show continuation rows
+      for (let j = 1; j < span && (i + j) < regCount; j++) {
+        const tr2 = document.createElement('tr');
+        tr2.className = 'fade-in';
+        tr2.style.animationDelay = `${(i+j) * 15}ms`;
+        const rawU16b = regValues[i + j];
+        tr2.innerHTML = `
+          <td class="addr">${displayStartAddr + i + j}</td>
+          <td class="val">${rawU16b}</td>
+          <td class="hex">0x${rawU16b.toString(16).toUpperCase().padStart(4,'0')}</td>
+          <td class="span-note">↑ part of ${def.label}</td>
+          <td class="span-note">—</td>`;
+        body.appendChild(tr2);
       }
 
-    } else if (fc === 3 || fc === 4) {
-      // ── Holding / Input Registers ──
-      formatBar.style.display = 'flex';
-
-      // Dynamic header based on active formats
-      let hdr = '<th>Address</th>';
-      if (outputFormats.decimal) hdr += '<th>Decimal</th>';
-      if (outputFormats.hex)     hdr += '<th>Hex</th>';
-      if (outputFormats.signed)  hdr += '<th>Signed</th>';
-      if (outputFormats.binary)  hdr += '<th>Binary</th>';
-      if (outputFormats.ascii)   hdr += '<th>ASCII</th>';
-      if (outputFormats.float32) hdr += '<th>Float32</th>';
-      head.innerHTML = `<tr>${hdr}</tr>`;
-
-      const byteCount = data[2];
-      const regCount = byteCount / 2;
-
-      // Collect register values for float32 pairing
-      const regValues = [];
-      for (let i = 0; i < regCount; i++) {
-        regValues.push((data[3 + i * 2] << 8) | data[4 + i * 2]);
-      }
-
-      for (let i = 0; i < regCount; i++) {
-        const val = regValues[i];
-        const signed = val > 32767 ? val - 65536 : val;
-        const tr = document.createElement('tr');
-        tr.className = 'fade-in';
-        tr.style.animationDelay = `${i * 15}ms`;
-
-        let cells = `<td class="addr">${displayStartAddr + i}</td>`;
-        if (outputFormats.decimal) cells += `<td class="val">${val}</td>`;
-        if (outputFormats.hex)     cells += `<td class="hex">0x${val.toString(16).toUpperCase().padStart(4, '0')}</td>`;
-        if (outputFormats.signed)  cells += `<td>${signed}</td>`;
-        if (outputFormats.binary)  cells += `<td class="bin">${val.toString(2).padStart(16, '0')}</td>`;
-        if (outputFormats.ascii)   cells += `<td class="ascii">${escapeHtml(toAsciiChar(val))}</td>`;
-        if (outputFormats.float32) {
-          let f32 = '';
-          if (i % 2 === 0 && i + 1 < regCount) {
-            const fval = toFloat32(regValues[i], regValues[i + 1]);
-            f32 = isNaN(fval) || !isFinite(fval) ? '—' : fval.toPrecision(7);
-          } else if (i % 2 === 1) {
-            f32 = '<span style="opacity:0.3">↑ pair</span>';
-          } else {
-            f32 = '—';
-          }
-          cells += `<td class="val">${f32}</td>`;
-        }
-
-        tr.innerHTML = cells;
-        body.appendChild(tr);
-      }
-
-    } else if (fc === 5 || fc === 6 || fc === 15 || fc === 16) {
-      // ── Write Responses ──
-      formatBar.style.display = 'none';
-      head.innerHTML = '<tr><th>Field</th><th>Value</th><th>Hex</th></tr>';
-      const respAddr = (data[2] << 8 | data[3]);
-      const valRaw = (data[4] << 8 | data[5]);
-
-      // Show the display address (original user addr) for the address field
-      const info = [
-        ['Slave ID', data[0], `0x${data[0].toString(16).toUpperCase().padStart(2, '0')}`],
-        ['Function Code', data[1], `0x${data[1].toString(16).toUpperCase().padStart(2, '0')}`],
-        ['Address (wire)', respAddr, `0x${respAddr.toString(16).toUpperCase().padStart(4, '0')}`],
-        ['Address (display)', displayStartAddr, `—`],
-        [fc === 5 || fc === 15 ? 'Coil Value' : 'Register Value', valRaw, `0x${valRaw.toString(16).toUpperCase().padStart(4, '0')}`],
-        ['Status', 'Success ✓', '—'],
-      ];
-      info.forEach(([field, val, hex], i) => {
-        const tr = document.createElement('tr');
-        tr.className = 'fade-in';
-        tr.style.animationDelay = `${i * 30}ms`;
-        tr.innerHTML = `<td>${field}</td><td class="val">${val}</td><td class="hex">${hex}</td>`;
-        body.appendChild(tr);
-      });
+      i += span;
     }
+    return; // already cached above
+
+  } else if (fc===5||fc===6||fc===15||fc===16) {
+    // ── Write Responses ──
+    dtypeBar.classList.remove('visible');
+    head.innerHTML='<tr><th>Field</th><th>Value</th><th>Hex</th></tr>';
+    const respAddr=(data[2]<<8|data[3]), valRaw=(data[4]<<8|data[5]);
+    const info=[
+      ['Slave ID', data[0], `0x${data[0].toString(16).toUpperCase().padStart(2,'0')}`],
+      ['Function Code', data[1], `0x${data[1].toString(16).toUpperCase().padStart(2,'0')}`],
+      ['Address (wire)', respAddr, `0x${respAddr.toString(16).toUpperCase().padStart(4,'0')}`],
+      ['Address (display)', displayStartAddr, '—'],
+      [fc===5||fc===15?'Coil Value':'Register Value', valRaw, `0x${valRaw.toString(16).toUpperCase().padStart(4,'0')}`],
+      ['Status', 'Success ✓', '—'],
+    ];
+    info.forEach(([field,val,hex],i) => {
+      const tr=document.createElement('tr'); tr.className='fade-in'; tr.style.animationDelay=`${i*30}ms`;
+      tr.innerHTML=`<td>${field}</td><td class="val">${val}</td><td class="hex">${hex}</td>`;
+      body.appendChild(tr);
+    });
   }
 
-  // ─── FC Management ─────────────────────────────────────
-  const fcNames = {
-    1: 'Read Coils', 2: 'Read Discrete Inputs', 3: 'Read Holding Registers',
-    4: 'Read Input Registers', 5: 'Write Single Coil', 6: 'Write Single Register',
-    15: 'Write Multiple Coils', 16: 'Write Multiple Registers'
-  };
+  // Cache for non-register FCs
+  lastResponse = { fc, data, displayStartAddr, quantity, elapsed };
+}
 
-  const writeFCs = [5, 6, 15, 16];
+function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  function setFC(fc, tabEl) {
-    currentFC = fc;
-    document.querySelectorAll('.fc-tab').forEach(t => t.classList.remove('active'));
-    tabEl.classList.add('active');
-    document.getElementById('fcName').textContent = fcNames[fc];
-    const badge = document.getElementById('fcBadge');
-    badge.textContent = `FC ${fc.toString().padStart(2, '0')}`;
-    badge.className = writeFCs.includes(fc) ? 'fc-badge write' : 'fc-badge';
+// ─── FC Management ───────────────────────────────────────
+const fcNames={1:'Read Coils',2:'Read Discrete Inputs',3:'Read Holding Registers',4:'Read Input Registers',5:'Write Single Coil',6:'Write Single Register',15:'Write Multiple Coils',16:'Write Multiple Registers'};
+const writeFCs=[5,6,15,16];
 
-    const writeGroup = document.getElementById('writeGroup');
-    const writeLabel = document.getElementById('writeLabel');
-    const writeHint = document.getElementById('writeHint');
-    const writeValue = document.getElementById('writeValue');
+function setFC(fc, tabEl) {
+  currentFC=fc;
+  document.querySelectorAll('.fc-tab').forEach(t=>t.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.getElementById('fcName').textContent=fcNames[fc];
+  const badge=document.getElementById('fcBadge');
+  badge.textContent=`FC ${fc.toString().padStart(2,'0')}`;
+  badge.className=writeFCs.includes(fc)?'fc-badge write':'fc-badge';
+  const writeGroup=document.getElementById('writeGroup');
+  const writeLabel=document.getElementById('writeLabel');
+  const writeHint=document.getElementById('writeHint');
+  const writeValue=document.getElementById('writeValue');
+  if (writeFCs.includes(fc)) {
+    writeGroup.style.display='block';
+    if (fc===5) { writeLabel.textContent='Coil Value'; writeValue.placeholder='1 or 0'; writeHint.textContent='Enter 1/true/on for ON, 0/false/off for OFF.'; }
+    else if (fc===6) { writeLabel.textContent='Register Value (0-65535)'; writeValue.placeholder='e.g. 1234'; writeHint.textContent='Single unsigned 16-bit integer.'; }
+    else if (fc===15) { writeLabel.textContent='Coil Values'; writeValue.placeholder='1,0,1,1,0,1'; writeHint.textContent='Comma/space separated 1/0 values.'; }
+    else if (fc===16) { writeLabel.textContent='Register Values'; writeValue.placeholder='100, 200, 300'; writeHint.textContent='Comma/space separated 16-bit integers.'; }
+  } else { writeGroup.style.display='none'; }
+}
 
-    if (writeFCs.includes(fc)) {
-      writeGroup.style.display = 'block';
-      if (fc === 5) {
-        writeLabel.textContent = 'Coil Value';
-        writeValue.placeholder = '1 or 0 (ON/OFF)';
-        writeHint.textContent = 'Enter 1/true/on for ON, 0/false/off for OFF.';
-      } else if (fc === 6) {
-        writeLabel.textContent = 'Register Value (0-65535)';
-        writeValue.placeholder = 'e.g. 1234';
-        writeHint.textContent = 'Enter a single unsigned 16-bit integer value.';
-      } else if (fc === 15) {
-        writeLabel.textContent = 'Coil Values';
-        writeValue.placeholder = '1,0,1,1,0,1';
-        writeHint.textContent = 'Comma or space-separated list of 1/0 values.';
-      } else if (fc === 16) {
-        writeLabel.textContent = 'Register Values';
-        writeValue.placeholder = '100, 200, 300';
-        writeHint.textContent = 'Comma or space-separated list of 16-bit unsigned integers.';
-      }
-    } else {
-      writeGroup.style.display = 'none';
-    }
+// ─── Polling ─────────────────────────────────────────────
+function togglePolling() {
+  const btn=document.getElementById('btnPoll');
+  if (isPolling) {
+    clearInterval(pollingTimer); pollingTimer=null; isPolling=false;
+    btn.textContent='Start Polling'; btn.classList.remove('btn-danger'); btn.classList.add('btn-secondary');
+    addLog('tx','Polling stopped');
+  } else {
+    if (!connected) { addLog('err','Connect first.'); return; }
+    const interval=parseInt(document.getElementById('pollInterval').value)||1000;
+    isPolling=true; btn.textContent='Stop Polling'; btn.classList.remove('btn-secondary'); btn.classList.add('btn-danger');
+    addLog('tx',`Polling every ${interval}ms`);
+    sendQuery(); pollingTimer=setInterval(sendQuery, interval);
   }
+}
 
-  // ─── Polling ───────────────────────────────────────────
-  function togglePolling() {
-    const btn = document.getElementById('btnPoll');
-    if (isPolling) {
-      clearInterval(pollingTimer);
-      pollingTimer = null;
-      isPolling = false;
-      btn.textContent = 'Start Polling';
-      btn.classList.remove('btn-danger');
-      btn.classList.add('btn-secondary');
-      addLog('tx', 'Polling stopped');
-    } else {
-      if (!connected) { addLog('err', 'Connect first before polling.'); return; }
-      const interval = parseInt(document.getElementById('pollInterval').value) || 1000;
-      isPolling = true;
-      btn.textContent = 'Stop Polling';
-      btn.classList.remove('btn-secondary');
-      btn.classList.add('btn-danger');
-      addLog('tx', `Polling started every ${interval}ms`);
-      sendQuery();
-      pollingTimer = setInterval(sendQuery, interval);
-    }
-  }
+// ─── Logging ─────────────────────────────────────────────
+function addLog(dir, msg) {
+  logEntries++;
+  document.getElementById('logCount').textContent=logEntries;
+  const logBody=document.getElementById('logBody');
+  const now=new Date();
+  const time=`${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}.${now.getMilliseconds().toString().padStart(3,'0')}`;
+  const dirLabel=dir==='tx'?'TX':dir==='rx'?'RX':'!!';
+  const entry=document.createElement('div');
+  entry.className='log-entry fade-in';
+  entry.innerHTML=`<span class="log-time">${time}</span><span class="log-dir ${dir}">${dirLabel}</span><span class="log-msg">${msg}</span>`;
+  logBody.appendChild(entry);
+  logBody.scrollTop=logBody.scrollHeight;
+}
 
-  // ─── Logging ───────────────────────────────────────────
-  function addLog(dir, msg) {
-    logEntries++;
-    document.getElementById('logCount').textContent = logEntries;
-    const logBody = document.getElementById('logBody');
-    const now = new Date();
-    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;
-    const dirLabel = dir === 'tx' ? 'TX' : dir === 'rx' ? 'RX' : '!!';
-    const entry = document.createElement('div');
-    entry.className = 'log-entry fade-in';
-    entry.innerHTML = `<span class="log-time">${time}</span><span class="log-dir ${dir}">${dirLabel}</span><span class="log-msg">${msg}</span>`;
-    logBody.appendChild(entry);
-    logBody.scrollTop = logBody.scrollHeight;
-  }
-
-  function clearLog() {
-    document.getElementById('logBody').innerHTML = '';
-    logEntries = 0;
-    document.getElementById('logCount').textContent = '0';
-  }
-
-  function toggleLog() {
-    const body = document.getElementById('logBody');
-    logCollapsed = !logCollapsed;
-    body.classList.toggle('collapsed', logCollapsed);
-  }
-
-  // ─── Helpers ───────────────────────────────────────────
-  function toHexStr(arr) {
-    return Array.from(arr).map(b => b.toString(16).toUpperCase().padStart(2, '0')).join(' ');
-  }
+function clearLog() { document.getElementById('logBody').innerHTML=''; logEntries=0; document.getElementById('logCount').textContent='0'; }
+function toggleLog() { logCollapsed=!logCollapsed; document.getElementById('logBody').classList.toggle('collapsed',logCollapsed); }
+function toHexStr(arr) { return Array.from(arr).map(b=>b.toString(16).toUpperCase().padStart(2,'0')).join(' '); }
 </script>
 </body>
 </html>
