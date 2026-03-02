@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,1082 +6,463 @@
 <title>Modbus RTU Master</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg-primary: #0a0e17;
-    --bg-secondary: #111827;
-    --bg-card: #1a2233;
-    --bg-input: #0d1420;
-    --border: #2a3a52;
-    --text-primary: #e2e8f0;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    --accent-blue: #3b82f6;
-    --accent-green: #10b981;
-    --accent-amber: #f59e0b;
-    --accent-red: #ef4444;
-    --accent-cyan: #06b6d4;
-    --accent-purple: #a78bfa;
-    --glow-blue: rgba(59, 130, 246, 0.15);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Outfit', sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image:
-      linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none; z-index: 0;
-  }
-
-  .app { position: relative; z-index: 1; }
-
-  .header {
-    background: var(--bg-secondary); border-bottom: 1px solid var(--border);
-    padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  }
-  .header-left { display: flex; align-items: center; gap: 14px; }
-  .logo {
-    width: 38px; height: 38px;
-    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
-    border-radius: 10px; display: flex; align-items: center; justify-content: center;
-    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 16px; color: #fff;
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-  }
-  .header h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
-  .header h1 span { color: var(--text-muted); font-weight: 400; }
-
-  .connection-status {
-    display: flex; align-items: center; gap: 8px;
-    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary);
-    background: var(--bg-card); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border);
-  }
-  .status-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); transition: all 0.3s;
-  }
-  .status-dot.connected { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
-
-  .main { display: grid; grid-template-columns: 340px 1fr; gap: 0; min-height: calc(100vh - 71px); }
-
-  .sidebar {
-    background: var(--bg-secondary); border-right: 1px solid var(--border);
-    padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
-  }
-
-  .card {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 20px; transition: border-color 0.2s;
-  }
-  .card:hover { border-color: rgba(59, 130, 246, 0.3); }
-
-  .card-title {
-    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--text-muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
-  }
-  .card-title svg { width: 14px; height: 14px; opacity: 0.6; }
-
-  .form-group { margin-bottom: 12px; }
-  .form-group:last-child { margin-bottom: 0; }
-  label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 5px; }
-
-  input, select {
-    width: 100%; padding: 9px 12px; background: var(--bg-input); border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text-primary);
-    font-family: 'JetBrains Mono', monospace; font-size: 13px;
-    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  input:focus, select:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px var(--glow-blue); }
-  select { cursor: pointer; }
-  select option { background: var(--bg-secondary); }
-
-  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    gap: 8px; padding: 10px 18px; border-radius: 8px;
-    font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600;
-    cursor: pointer; border: none; transition: all 0.2s; width: 100%;
-  }
-  .btn svg { width: 16px; height: 16px; }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent-blue), #2563eb);
-    color: #fff; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-  }
-  .btn-primary:hover { box-shadow: 0 6px 25px rgba(59, 130, 246, 0.45); transform: translateY(-1px); }
-  .btn-primary:active { transform: translateY(0); }
-  .btn-secondary { background: var(--bg-input); color: var(--text-secondary); border: 1px solid var(--border); }
-  .btn-secondary:hover { background: var(--bg-card); color: var(--text-primary); }
-  .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.2); }
-  .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
-  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
-
-  .content { padding: 24px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
-
-  .fc-tabs {
-    display: flex; gap: 6px; flex-wrap: wrap; padding: 4px;
-    background: var(--bg-secondary); border-radius: 12px; border: 1px solid var(--border);
-  }
-  .fc-tab {
-    padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 500;
-    cursor: pointer; border: none; background: transparent;
-    color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
-    transition: all 0.2s; white-space: nowrap;
-  }
-  .fc-tab:hover { color: var(--text-secondary); background: var(--bg-card); }
-  .fc-tab.active { background: var(--accent-blue); color: #fff; box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3); }
-  .fc-tab.write.active { background: var(--accent-amber); box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3); }
-
-  .query-panel { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-  .query-panel .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-  .query-panel h3 { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-  .fc-badge {
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 3px 8px; border-radius: 6px;
-    background: var(--glow-blue); color: var(--accent-blue); font-weight: 600;
-  }
-  .fc-badge.write { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
-
-  .write-value-group {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 8px; padding: 14px; margin-bottom: 16px;
-  }
-  .write-value-group h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-amber); margin-bottom: 10px; }
-
-  .send-btn-row { display: flex; gap: 8px; }
-
-  /* Wire address preview */
-  .wire-addr-preview {
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent-cyan);
-    background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.15);
-    border-radius: 6px; padding: 6px 10px; margin-top: 8px; display: none; line-height: 1.5;
-  }
-  .wire-addr-preview.visible { display: block; }
-
-  .offset-indicator {
-    font-family: 'JetBrains Mono', monospace; font-size: 11px;
-    color: var(--accent-cyan); background: rgba(6, 182, 212, 0.1);
-    border: 1px solid rgba(6, 182, 212, 0.2);
-    padding: 4px 10px; border-radius: 6px; display: none; align-items: center; gap: 4px;
-  }
-  .offset-indicator.visible { display: inline-flex; }
-
-  .response-area { flex: 1; display: flex; flex-direction: column; gap: 16px; }
-  .response-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-  .response-header h3 { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
-
-  .response-meta {
-    font-family: 'JetBrains Mono', monospace; font-size: 11px;
-    color: var(--text-muted); display: flex; gap: 16px;
-  }
-  .response-meta span { display: flex; align-items: center; gap: 4px; }
-
-  .response-table-wrap {
-    background: var(--bg-secondary); border: 1px solid var(--border);
-    border-radius: 12px; overflow: hidden; flex: 1;
-  }
-
-  /* Response table with horizontal scroll for many columns */
-  .response-table-inner { overflow-x: auto; }
-
-  table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
-  thead { background: var(--bg-card); }
-  th {
-    text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.06em;
-    color: var(--text-muted); border-bottom: 1px solid var(--border); white-space: nowrap;
-  }
-  td { padding: 9px 14px; border-bottom: 1px solid rgba(42, 58, 82, 0.4); color: var(--text-secondary); white-space: nowrap; }
-  tr:hover td { background: rgba(59, 130, 246, 0.04); }
-
-  td.addr { color: var(--accent-cyan); }
-  td.val { color: var(--text-primary); font-weight: 500; }
-  td.hex { color: var(--accent-amber); }
-  td.bin { color: var(--text-muted); font-size: 11px; }
-  td.ascii { color: var(--accent-purple); font-weight: 500; }
-  td.bool-true { color: var(--accent-green); font-weight: 600; }
-  td.bool-false { color: var(--accent-red); }
-  td.interpreted { color: var(--accent-green); font-weight: 500; }
-  td.span-note { color: var(--text-muted); font-style: italic; font-size: 11px; }
-
-  .empty-state {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 60px 20px; color: var(--text-muted); text-align: center; gap: 12px;
-  }
-  .empty-state svg { width: 48px; height: 48px; opacity: 0.3; }
-  .empty-state p { font-size: 14px; }
-  .empty-state small { font-size: 12px; opacity: 0.6; }
-
-  /* Data Type Selector Bar */
-  .dtype-bar {
-    background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px;
-    padding: 14px 16px; display: none;
-  }
-  .dtype-bar.visible { display: block; }
-  .dtype-bar-header {
-    display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;
-  }
-  .dtype-bar-header h4 {
-    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);
-  }
-  .dtype-bar-actions { display: flex; gap: 6px; }
-  .dtype-bar-actions button {
-    padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600;
-    cursor: pointer; border: none; font-family: 'JetBrains Mono', monospace; transition: all 0.15s;
-    background: var(--accent-purple); color: #fff;
-  }
-  .dtype-bar-actions button:hover { opacity: 0.85; transform: translateY(-1px); }
-  .dtype-bar-actions button.secondary-action {
-    background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border);
-  }
-
-  .dtype-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 6px; max-height: 200px; overflow-y: auto;
-    padding-right: 4px;
-  }
-
-  .dtype-item {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
-    padding: 5px 8px; font-size: 11px;
-  }
-  .dtype-item .dtype-addr {
-    color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace;
-    min-width: 48px; font-weight: 600;
-  }
-  .dtype-item select {
-    padding: 4px 6px; font-size: 11px; border-radius: 4px; flex: 1; min-width: 0;
-  }
-
-  /* Byte order selector */
-  .byte-order-row {
-    display: flex; align-items: center; gap: 8px; margin-top: 8px;
-    font-size: 11px; color: var(--text-muted);
-  }
-  .byte-order-row label { margin: 0; font-size: 11px; }
-  .byte-order-row select { width: auto; padding: 4px 8px; font-size: 11px; border-radius: 4px; }
-
-  /* Raw Frame Panel */
-  .raw-frame-panel {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 8px; padding: 14px 16px;
-    font-family: 'JetBrains Mono', monospace; font-size: 11px;
-    display: none; line-height: 1.7;
-  }
-  .raw-frame-panel .raw-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; }
-  .raw-row { display: flex; gap: 8px; margin-bottom: 2px; }
-  .raw-tag { color: var(--text-muted); min-width: 46px; font-weight: 600; }
-  .raw-hex-data { color: var(--accent-amber); word-break: break-all; }
-  .raw-bin-data { color: var(--text-muted); word-break: break-all; font-size: 10px; }
-  .raw-ascii-data { color: var(--accent-purple); word-break: break-all; }
-
-  /* Log Panel */
-  .log-panel { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-  .log-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none;
-  }
-  .log-header h3 { font-size: 13px; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
-  .log-count { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 7px; border-radius: 10px; background: var(--glow-blue); color: var(--accent-blue); }
-  .log-body { max-height: 200px; overflow-y: auto; padding: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.7; }
-  .log-body.collapsed { display: none; }
-  .log-entry { padding: 2px 8px; border-radius: 4px; display: flex; gap: 10px; }
-  .log-entry:hover { background: var(--bg-card); }
-  .log-time { color: var(--text-muted); white-space: nowrap; }
-  .log-dir { font-weight: 600; width: 22px; }
-  .log-dir.tx { color: var(--accent-blue); }
-  .log-dir.rx { color: var(--accent-green); }
-  .log-dir.err { color: var(--accent-red); }
-  .log-msg { color: var(--text-secondary); word-break: break-all; }
-
-  .toggle-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-  .toggle-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent-cyan); cursor: pointer; }
-  .toggle-row label { margin: 0; font-size: 12px; font-weight: 500; color: var(--text-secondary); cursor: pointer; }
-  .offset-hint { font-size: 10px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
-  .offset-hint b { color: var(--accent-cyan); }
-
-  .api-note {
-    font-size: 11px; color: var(--text-muted);
-    background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.15);
-    border-radius: 8px; padding: 10px 14px; line-height: 1.5;
-  }
-  .api-note strong { color: var(--accent-amber); }
-
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-  .fade-in { animation: fadeIn 0.3s ease-out; }
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-  .sending .status-dot { animation: pulse 0.6s infinite; background: var(--accent-blue); }
-
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-  @media (max-width: 900px) {
-    .main { grid-template-columns: 1fr; }
-    .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
-  }
+:root{--bg-primary:#0a0e17;--bg-secondary:#111827;--bg-card:#1a2233;--bg-input:#0d1420;--border:#2a3a52;--text-primary:#e2e8f0;--text-secondary:#94a3b8;--text-muted:#64748b;--accent-blue:#3b82f6;--accent-green:#10b981;--accent-amber:#f59e0b;--accent-red:#ef4444;--accent-cyan:#06b6d4;--accent-purple:#a78bfa;--accent-pink:#ec4899;--glow-blue:rgba(59,130,246,0.15)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(59,130,246,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.app{position:relative;z-index:1}
+.header{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.header-left{display:flex;align-items:center;gap:14px}
+.logo{width:38px;height:38px;background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:16px;color:#fff;box-shadow:0 0 20px rgba(59,130,246,0.3)}
+.header h1{font-size:20px;font-weight:600;letter-spacing:-0.02em}
+.header h1 span{color:var(--text-muted);font-weight:400}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.connection-status{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-secondary);background:var(--bg-card);padding:8px 14px;border-radius:8px;border:1px solid var(--border)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-red);box-shadow:0 0 8px var(--accent-red);transition:all 0.3s}
+.status-dot.connected{background:var(--accent-green);box-shadow:0 0 8px var(--accent-green)}
+.hdr-btn{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;color:var(--text-muted);font-size:12px;font-family:'Outfit',sans-serif;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:6px}
+.hdr-btn:hover{color:var(--text-primary);border-color:var(--accent-blue)}
+.hdr-btn svg{width:14px;height:14px}
+.hdr-btn.profile-active{border-color:var(--accent-pink);color:var(--accent-pink)}
+.profile-badge{font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;border-radius:6px;background:rgba(236,72,153,0.12);color:var(--accent-pink);border:1px solid rgba(236,72,153,0.25);display:none;align-items:center;gap:6px}
+.profile-badge.visible{display:inline-flex}
+.profile-badge .pb-clear{cursor:pointer;opacity:0.6;transition:opacity 0.15s}
+.profile-badge .pb-clear:hover{opacity:1}
+.main{display:grid;grid-template-columns:340px 1fr;gap:0;min-height:calc(100vh - 71px)}
+.sidebar{background:var(--bg-secondary);border-right:1px solid var(--border);padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:20px}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;transition:border-color 0.2s}
+.card:hover{border-color:rgba(59,130,246,0.3)}
+.card-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title svg{width:14px;height:14px;opacity:0.6}
+.form-group{margin-bottom:12px}
+.form-group:last-child{margin-bottom:0}
+label{display:block;font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:5px}
+input,select{width:100%;padding:9px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+input:focus,select:focus{border-color:var(--accent-blue);box-shadow:0 0 0 3px var(--glow-blue)}
+select{cursor:pointer}select option{background:var(--bg-secondary)}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;width:100%}
+.btn svg{width:16px;height:16px}
+.btn-primary{background:linear-gradient(135deg,var(--accent-blue),#2563eb);color:#fff;box-shadow:0 4px 15px rgba(59,130,246,0.3)}
+.btn-primary:hover{box-shadow:0 6px 25px rgba(59,130,246,0.45);transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-secondary{background:var(--bg-input);color:var(--text-secondary);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--bg-card);color:var(--text-primary)}
+.btn-danger{background:rgba(239,68,68,0.1);color:var(--accent-red);border:1px solid rgba(239,68,68,0.2)}
+.btn-danger:hover{background:rgba(239,68,68,0.2)}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.content{padding:24px;display:flex;flex-direction:column;gap:20px;overflow-y:auto}
+.fc-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:4px;background:var(--bg-secondary);border-radius:12px;border:1px solid var(--border)}
+.fc-tab{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--text-muted);font-family:'JetBrains Mono',monospace;transition:all 0.2s;white-space:nowrap}
+.fc-tab:hover{color:var(--text-secondary);background:var(--bg-card)}
+.fc-tab.active{background:var(--accent-blue);color:#fff;box-shadow:0 2px 10px rgba(59,130,246,0.3)}
+.fc-tab.write.active{background:var(--accent-amber);box-shadow:0 2px 10px rgba(245,158,11,0.3)}
+.query-panel{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;padding:20px}
+.query-panel .panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.query-panel h3{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.fc-badge{font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 8px;border-radius:6px;background:var(--glow-blue);color:var(--accent-blue);font-weight:600}
+.fc-badge.write{background:rgba(245,158,11,0.15);color:var(--accent-amber)}
+.write-value-group{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:16px}
+.write-value-group h4{font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent-amber);margin-bottom:10px}
+.send-btn-row{display:flex;gap:8px}
+.wire-addr-preview{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-cyan);background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.15);border-radius:6px;padding:6px 10px;margin-top:8px;display:none;line-height:1.5}
+.wire-addr-preview.visible{display:block}
+.offset-indicator{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-cyan);background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);padding:4px 10px;border-radius:6px;display:none;align-items:center;gap:4px}
+.offset-indicator.visible{display:inline-flex}
+.toggle-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.toggle-row input[type="checkbox"]{width:16px;height:16px;accent-color:var(--accent-cyan);cursor:pointer}
+.toggle-row label{margin:0;font-size:12px;font-weight:500;color:var(--text-secondary);cursor:pointer}
+.offset-hint{font-size:10px;color:var(--text-muted);margin-top:4px;line-height:1.5}
+.offset-hint b{color:var(--accent-cyan)}
+.api-note{font-size:11px;color:var(--text-muted);background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:10px 14px;line-height:1.5}
+.api-note strong{color:var(--accent-amber)}
+.collapsible{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;transition:background 0.15s}
+.collapsible-header:hover{background:rgba(59,130,246,0.04)}
+.collapsible-header h3{font-size:13px;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:8px}
+.collapsible-header h3 svg{width:14px;height:14px;opacity:0.5}
+.collapsible-header .chevron{width:16px;height:16px;color:var(--text-muted);transition:transform 0.2s}
+.collapsible.collapsed .chevron{transform:rotate(-90deg)}
+.collapsible.collapsed .collapsible-body{display:none}
+.collapsible-header-right{display:flex;align-items:center;gap:8px}
+.response-table-inner{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:13px}
+thead{background:var(--bg-card)}
+th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid rgba(42,58,82,0.4);color:var(--text-secondary);white-space:nowrap}
+tr:hover td{background:rgba(59,130,246,0.04)}
+td.addr{color:var(--accent-cyan)}
+td.lbl{color:var(--accent-pink);font-weight:500;font-family:'Outfit',sans-serif;font-size:12px}
+td.val{color:var(--text-primary);font-weight:500}
+td.hex{color:var(--accent-amber)}
+td.bool-true{color:var(--accent-green);font-weight:600}
+td.bool-false{color:var(--accent-red)}
+td.interpreted{color:var(--accent-green);font-weight:500}
+td.span-note{color:var(--text-muted);font-style:italic;font-size:11px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--text-muted);text-align:center;gap:12px}
+.empty-state svg{width:48px;height:48px;opacity:0.3}
+.empty-state p{font-size:14px}
+.empty-state small{font-size:12px;opacity:0.6}
+.error-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;gap:10px}
+.error-state .error-icon{font-size:36px;opacity:0.7}
+.error-state .error-title{font-size:14px;font-weight:600;color:var(--accent-red)}
+.error-state .error-detail{font-size:12px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;max-width:500px}
+.dtype-bar-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;flex-wrap:wrap;gap:8px}
+.dtype-bar-actions{display:flex;gap:6px}
+.dtype-bar-actions button{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:'JetBrains Mono',monospace;transition:all 0.15s;background:var(--accent-purple);color:#fff}
+.dtype-bar-actions button:hover{opacity:0.85;transform:translateY(-1px)}
+.dtype-bar-actions button.secondary-action{background:var(--bg-card);color:var(--text-secondary);border:1px solid var(--border)}
+.dtype-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px;max-height:200px;overflow-y:auto;padding:0 16px 12px 16px}
+.dtype-item{display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:11px}
+.dtype-item .dtype-addr{color:var(--accent-cyan);font-family:'JetBrains Mono',monospace;min-width:48px;font-weight:600}
+.dtype-item select{padding:4px 6px;font-size:11px;border-radius:4px;flex:1;min-width:0}
+.byte-order-row{display:flex;align-items:center;gap:8px;padding:0 16px 12px 16px;font-size:11px;color:var(--text-muted)}
+.byte-order-row label{margin:0;font-size:11px}
+.byte-order-row select{width:auto;padding:4px 8px;font-size:11px;border-radius:4px}
+.raw-frame-body{padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7}
+.raw-row{display:flex;gap:8px;margin-bottom:2px}
+.raw-tag{color:var(--text-muted);min-width:46px;font-weight:600}
+.raw-hex-data{color:var(--accent-amber);word-break:break-all}
+.raw-bin-data{color:var(--text-muted);word-break:break-all;font-size:10px}
+.raw-ascii-data{color:var(--accent-purple);word-break:break-all}
+.log-body{max-height:200px;overflow-y:auto;padding:8px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7}
+.log-entry{padding:2px 8px;border-radius:4px;display:flex;gap:10px}
+.log-entry:hover{background:var(--bg-card)}
+.log-time{color:var(--text-muted);white-space:nowrap}
+.log-dir{font-weight:600;width:22px}
+.log-dir.tx{color:var(--accent-blue)}
+.log-dir.rx{color:var(--accent-green)}
+.log-dir.err{color:var(--accent-red)}
+.log-msg{color:var(--text-secondary);word-break:break-all}
+.log-count{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 7px;border-radius:10px;background:var(--glow-blue);color:var(--accent-blue)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-overlay.visible{display:flex}
+.modal{background:var(--bg-secondary);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:640px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.modal .version{font-size:12px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-bottom:16px}
+.modal p{font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:12px}
+.modal .license-box{background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);line-height:1.6;margin:12px 0;max-height:180px;overflow-y:auto}
+.modal .credits{font-size:11px;color:var(--text-muted);line-height:1.6}
+.modal .credits b{color:var(--text-secondary)}
+.modal .close-modal{margin-top:16px;padding:8px 20px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;transition:all 0.2s}
+.modal .close-modal:hover{background:var(--accent-blue);border-color:var(--accent-blue)}
+.profile-modal{max-width:720px}
+.profile-modal h2{color:var(--accent-pink)}
+.profile-name-row{display:flex;gap:10px;margin-bottom:16px}
+.profile-name-row input{flex:1}
+.profile-entries{max-height:320px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;background:var(--bg-input)}
+.profile-entry-header{display:grid;grid-template-columns:80px 70px 1fr 140px 36px;gap:6px;padding:8px 10px;background:var(--bg-card);border-bottom:1px solid var(--border);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted)}
+.profile-entry{display:grid;grid-template-columns:80px 70px 1fr 140px 36px;gap:6px;padding:6px 10px;border-bottom:1px solid rgba(42,58,82,0.3);align-items:center}
+.profile-entry input,.profile-entry select{padding:5px 8px;font-size:11px;border-radius:4px}
+.profile-entry .pe-del{background:none;border:none;color:var(--accent-red);cursor:pointer;font-size:16px;padding:4px;border-radius:4px;transition:background 0.15s;display:flex;align-items:center;justify-content:center}
+.profile-entry .pe-del:hover{background:rgba(239,68,68,0.15)}
+.profile-add-row{padding:8px 10px}
+.profile-add-row button{padding:6px 14px;font-size:11px}
+.profile-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.profile-actions button{padding:9px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'Outfit',sans-serif;transition:all 0.2s}
+.pa-save{background:var(--accent-pink);color:#fff}
+.pa-save:hover{opacity:0.9}
+.pa-export{background:var(--accent-green);color:#fff}
+.pa-import{background:var(--accent-amber);color:#fff}
+.pa-clear{background:rgba(239,68,68,0.15);color:var(--accent-red);border:1px solid rgba(239,68,68,0.2)!important}
+.pa-close{background:var(--bg-card);color:var(--text-secondary);border:1px solid var(--border)!important}
+.saved-profiles{margin-top:16px}
+.saved-profiles h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:8px}
+.saved-profile-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;transition:border-color 0.15s}
+.saved-profile-item:hover{border-color:var(--accent-pink)}
+.sp-name{font-size:13px;font-weight:600;color:var(--text-primary)}
+.sp-info{font-size:10px;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+.sp-actions{display:flex;gap:6px}
+.sp-actions button{padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s}
+.sp-load{background:var(--accent-pink);color:#fff}
+.sp-del{background:rgba(239,68,68,0.12);color:var(--accent-red);border:1px solid rgba(239,68,68,0.2)}
+.sp-del:hover{background:rgba(239,68,68,0.25)}
+.no-profiles{font-size:12px;color:var(--text-muted);padding:12px;text-align:center}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn 0.3s ease-out}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
+@media(max-width:900px){.main{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid var(--border)}}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="header">
-    <div class="header-left">
-      <div class="logo">MB</div>
-      <h1>Modbus RTU Master <span>/ Serial Client</span></h1>
-    </div>
-    <div class="connection-status" id="connStatus">
-      <div class="status-dot" id="statusDot"></div>
-      <span id="statusText">Disconnected</span>
-    </div>
-  </div>
 
-  <div class="main">
-    <div class="sidebar">
-      <div class="card">
-        <div class="card-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24"/></svg>
-          Serial Port Configuration
-        </div>
-        <div class="form-group">
-          <label>Baud Rate</label>
-          <select id="baudRate">
-            <option value="1200">1200</option><option value="2400">2400</option><option value="4800">4800</option>
-            <option value="9600" selected>9600</option><option value="19200">19200</option><option value="38400">38400</option>
-            <option value="57600">57600</option><option value="115200">115200</option>
-          </select>
-        </div>
-        <div class="row-2">
-          <div class="form-group"><label>Data Bits</label><select id="dataBits"><option value="7">7</option><option value="8" selected>8</option></select></div>
-          <div class="form-group"><label>Stop Bits</label><select id="stopBits"><option value="1" selected>1</option><option value="2">2</option></select></div>
-        </div>
-        <div class="row-2">
-          <div class="form-group"><label>Parity</label><select id="parity"><option value="none" selected>None</option><option value="even">Even</option><option value="odd">Odd</option></select></div>
-          <div class="form-group"><label>Timeout (ms)</label><input type="number" id="timeout" value="1000" min="100" max="10000" step="100"></div>
-        </div>
-        <div class="btn-row" style="margin-top:14px;">
-          <button class="btn btn-primary" id="btnConnect" onclick="toggleConnection()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg> Connect
-          </button>
-          <button class="btn btn-danger" id="btnDisconnect" onclick="disconnect()" style="display:none;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> Disconnect
-          </button>
-        </div>
-      </div>
+<!-- About Modal -->
+<div class="modal-overlay" id="aboutModal" onclick="if(event.target===this)closeAbout()"><div class="modal">
+<h2><span style="width:32px;height:32px;background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff;">MB</span>Modbus RTU Master</h2>
+<div class="version">v1.3.0 — Web Serial Client</div>
+<p>A browser-based Modbus RTU master using the Web Serial API. Supports FC01–FC06, FC15, FC16 with device profiles, per-register data type interpretation, minus offset addressing, and raw frame inspection.</p>
+<div class="credits"><b>Fonts:</b> JetBrains Mono &amp; Outfit — SIL Open Font License 1.1<br><b>Technology:</b> Web Serial API (Chrome/Edge 89+)<br><b>No external libraries or frameworks.</b></div>
+<div class="license-box">This is free and unencumbered software released into the public domain.
 
-      <div class="card">
-        <div class="card-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h4"/></svg>
-          Slave Configuration
-        </div>
-        <div class="row-2">
-          <div class="form-group"><label>Slave ID (1-247)</label><input type="number" id="slaveId" value="1" min="1" max="247"></div>
-          <div class="form-group"><label>Start Address</label><input type="number" id="startAddr" value="0" min="0" max="65535" oninput="updateWirePreview()"></div>
-        </div>
-        <div class="form-group"><label>Quantity</label><input type="number" id="quantity" value="10" min="1" max="125"></div>
-        <div class="wire-addr-preview" id="wireAddrPreview"></div>
-      </div>
+Anyone is free to copy, modify, publish, use, compile, sell, or distribute this software, either in source code form or as a compiled binary, for any purpose, commercial or non-commercial, and by any means.
 
-      <div class="card">
-        <div class="card-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><circle cx="12" cy="12" r="10"/></svg>
-          Minus Offset
-        </div>
-        <div class="toggle-row">
-          <input type="checkbox" id="minusOffsetEnabled" onchange="updateOffsetUI()">
-          <label for="minusOffsetEnabled">Enable Minus Offset</label>
-        </div>
-        <div class="form-group"><label>Offset Value</label><input type="number" id="minusOffset" value="0" min="0" max="65535" oninput="updateOffsetUI()"></div>
-        <div class="offset-hint">
-          Subtracts from the start address before sending on the wire.<br>
-          e.g. Start <b>10001</b>, Offset <b>10001</b> → Wire <b>0</b>
-        </div>
-      </div>
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
-      <div class="card">
-        <div class="card-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Auto-Polling
-        </div>
-        <div class="row-2">
-          <div class="form-group"><label>Interval (ms)</label><input type="number" id="pollInterval" value="1000" min="100" max="60000" step="100"></div>
-          <div class="form-group" style="display:flex;align-items:flex-end;">
-            <button class="btn btn-secondary" id="btnPoll" onclick="togglePolling()" style="width:100%;">Start Polling</button>
-          </div>
-        </div>
-      </div>
+For more information, please refer to &lt;https://unlicense.org&gt;</div>
+<button class="close-modal" onclick="closeAbout()">Close</button>
+</div></div>
 
-      <div class="api-note"><strong>⚡ Web Serial API</strong><br>Requires Chrome/Edge 89+. Click <strong>Connect</strong> to select your serial port.</div>
-    </div>
+<!-- Profile Modal -->
+<div class="modal-overlay" id="profileModal" onclick="if(event.target===this)closeProfile()"><div class="modal profile-modal">
+<h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>Device Profile Editor</h2>
+<p>Define labels and data types for coils, inputs, and registers. Save profiles locally or export/import as JSON files to share between sessions.</p>
+<div class="profile-name-row"><input type="text" id="profileName" placeholder="Profile name (e.g. Schneider PM5110, ABB ACS580...)"></div>
+<div class="profile-entries" id="profileEntries">
+  <div class="profile-entry-header"><span>Type</span><span>Address</span><span>Label</span><span>Data Type</span><span></span></div>
+  <div id="profileEntryList"></div>
+  <div class="profile-add-row"><button class="btn btn-secondary" onclick="addProfileEntry()" style="width:auto;">+ Add Entry</button></div>
+</div>
+<div class="profile-actions">
+  <button class="pa-save" onclick="saveCurrentProfile()">Save Profile</button>
+  <button class="pa-export" onclick="exportProfile()">Export JSON</button>
+  <button class="pa-import" onclick="document.getElementById('profileImportFile').click()">Import JSON</button>
+  <input type="file" id="profileImportFile" accept=".json" style="display:none" onchange="importProfile(event)">
+  <button class="pa-clear" onclick="clearActiveProfile()">Clear Active</button>
+  <button class="pa-close" onclick="closeProfile()">Close</button>
+</div>
+<div class="saved-profiles"><h4>Saved Profiles</h4><div id="savedProfilesList"></div></div>
+</div></div>
 
-    <div class="content">
-      <div class="fc-tabs">
-        <button class="fc-tab active" onclick="setFC(1, this)">FC01 Read Coils</button>
-        <button class="fc-tab" onclick="setFC(2, this)">FC02 Read Discrete</button>
-        <button class="fc-tab" onclick="setFC(3, this)">FC03 Read Holding</button>
-        <button class="fc-tab" onclick="setFC(4, this)">FC04 Read Input</button>
-        <button class="fc-tab write" onclick="setFC(5, this)">FC05 Write Coil</button>
-        <button class="fc-tab write" onclick="setFC(6, this)">FC06 Write Register</button>
-        <button class="fc-tab write" onclick="setFC(15, this)">FC15 Write Coils</button>
-        <button class="fc-tab write" onclick="setFC(16, this)">FC16 Write Registers</button>
-      </div>
+<!-- Header -->
+<div class="header">
+<div class="header-left"><div class="logo">MB</div><h1>Modbus RTU Master <span>/ Serial Client</span></h1></div>
+<div class="header-right">
+  <div class="profile-badge" id="profileBadge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg><span id="profileBadgeName"></span><span class="pb-clear" onclick="clearActiveProfile()" title="Clear profile">✕</span></div>
+  <div class="connection-status"><div class="status-dot" id="statusDot"></div><span id="statusText">Disconnected</span></div>
+  <button class="hdr-btn" id="profileBtn" onclick="openProfile()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>Profiles</button>
+  <button class="hdr-btn" onclick="openAbout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>About</button>
+</div></div>
 
-      <div class="query-panel">
-        <div class="panel-header">
-          <h3><span id="fcName">Read Coils</span><span class="fc-badge" id="fcBadge">FC 01</span></h3>
-        </div>
-        <div class="write-value-group" id="writeGroup" style="display:none;">
-          <h4>Write Value(s)</h4>
-          <div class="form-group"><label id="writeLabel">Value</label><input type="text" id="writeValue" placeholder="Enter value(s)..."></div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:6px;" id="writeHint"></div>
-        </div>
-        <div class="send-btn-row">
-          <button class="btn btn-primary" onclick="sendQuery()" style="max-width:200px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg> Send Query
-          </button>
-        </div>
-      </div>
-
-      <div class="response-area">
-        <div class="response-header">
-          <h3>Response Data</h3>
-          <div class="response-meta" id="responseMeta" style="display:none;">
-            <span>⏱ <span id="respTime">--</span>ms</span>
-            <span>📦 <span id="respBytes">--</span> bytes</span>
-            <span>Slave <span id="respSlave">--</span></span>
-            <span class="offset-indicator" id="offsetIndicator">Offset: <span id="offsetDisplay">0</span></span>
-          </div>
-        </div>
-
-        <!-- Data Type Assignment Bar -->
-        <div class="dtype-bar" id="dtypeBar">
-          <div class="dtype-bar-header">
-            <h4>Data Type per Register</h4>
-            <div class="dtype-bar-actions">
-              <button class="secondary-action" onclick="copyFirstToAll()" title="Copy first register's type to all">Copy #1 → All</button>
-              <button onclick="reRender()">Apply</button>
-            </div>
-          </div>
-          <div class="dtype-grid" id="dtypeGrid"></div>
-          <div class="byte-order-row">
-            <label>Byte Order:</label>
-            <select id="byteOrder" onchange="reRender()">
-              <option value="AB" selected>Big-Endian (AB CD)</option>
-              <option value="BA">Little-Endian (BA DC)</option>
-              <option value="CDAB">Mid-Big (CD AB)</option>
-              <option value="DCBA">Mid-Little (DC BA)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="response-table-wrap" id="responseWrap">
-          <div class="empty-state" id="emptyState">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h4"/></svg>
-            <p>No data yet</p>
-            <small>Connect to a serial port and send a Modbus query to see results.</small>
-          </div>
-          <div class="response-table-inner">
-            <table id="responseTable" style="display:none;">
-              <thead id="tableHead"></thead>
-              <tbody id="tableBody"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="raw-frame-panel" id="rawFramePanel">
-          <div class="raw-label">Raw Response Frame</div>
-          <div class="raw-row"><span class="raw-tag">HEX</span><span class="raw-hex-data" id="rawHex"></span></div>
-          <div class="raw-row"><span class="raw-tag">BIN</span><span class="raw-bin-data" id="rawBin"></span></div>
-          <div class="raw-row"><span class="raw-tag">ASCII</span><span class="raw-ascii-data" id="rawAscii"></span></div>
-        </div>
-      </div>
-
-      <div class="log-panel">
-        <div class="log-header" onclick="toggleLog()">
-          <h3>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
-            Communication Log <span class="log-count" id="logCount">0</span>
-          </h3>
-          <button class="btn btn-secondary" style="width:auto;padding:4px 10px;font-size:11px;" onclick="event.stopPropagation();clearLog();">Clear</button>
-        </div>
-        <div class="log-body" id="logBody"></div>
-      </div>
-    </div>
-  </div>
+<div class="main">
+<!-- Sidebar -->
+<div class="sidebar">
+<div class="card"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24"/></svg>Serial Port Configuration</div>
+<div class="form-group"><label>Baud Rate</label><select id="baudRate"><option value="1200">1200</option><option value="2400">2400</option><option value="4800">4800</option><option value="9600" selected>9600</option><option value="19200">19200</option><option value="38400">38400</option><option value="57600">57600</option><option value="115200">115200</option></select></div>
+<div class="row-2"><div class="form-group"><label>Data Bits</label><select id="dataBits"><option value="7">7</option><option value="8" selected>8</option></select></div><div class="form-group"><label>Stop Bits</label><select id="stopBits"><option value="1" selected>1</option><option value="2">2</option></select></div></div>
+<div class="row-2"><div class="form-group"><label>Parity</label><select id="parity"><option value="none" selected>None</option><option value="even">Even</option><option value="odd">Odd</option></select></div><div class="form-group"><label>Timeout (ms)</label><input type="number" id="timeout" value="1000" min="100" max="10000" step="100"></div></div>
+<div class="btn-row" style="margin-top:14px"><button class="btn btn-primary" id="btnConnect" onclick="toggleConnection()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Connect</button><button class="btn btn-danger" id="btnDisconnect" onclick="disconnect()" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>Disconnect</button></div></div>
+<div class="card"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h4"/></svg>Slave Configuration</div>
+<div class="row-2"><div class="form-group"><label>Slave ID (1-247)</label><input type="number" id="slaveId" value="1" min="1" max="247"></div><div class="form-group"><label>Start Address</label><input type="number" id="startAddr" value="0" min="0" max="65535" oninput="updateWirePreview()"></div></div>
+<div class="form-group"><label>Quantity</label><input type="number" id="quantity" value="10" min="1" max="125"></div>
+<div class="wire-addr-preview" id="wireAddrPreview"></div></div>
+<div class="card"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><circle cx="12" cy="12" r="10"/></svg>Minus Offset</div>
+<div class="toggle-row"><input type="checkbox" id="minusOffsetEnabled" onchange="updateOffsetUI()"><label for="minusOffsetEnabled">Enable Minus Offset</label></div>
+<div class="form-group"><label>Offset Value</label><input type="number" id="minusOffset" value="0" min="0" max="65535" oninput="updateOffsetUI()"></div>
+<div class="offset-hint">Subtracts from start address before sending on wire.<br>e.g. Start <b>10001</b>, Offset <b>10001</b> → Wire <b>0</b></div></div>
+<div class="card"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Auto-Polling</div>
+<div class="toggle-row"><input type="checkbox" id="pollingEnabled" onchange="togglePolling()"><label for="pollingEnabled">Enable Auto-Polling</label></div>
+<div class="form-group"><label>Interval (ms)</label><input type="number" id="pollInterval" value="1000" min="100" max="60000" step="100"></div>
+<div class="offset-hint">Automatically re-sends the current query at the specified interval.</div></div>
+<div class="api-note"><strong>⚡ Web Serial API</strong><br>Requires Chrome/Edge 89+.</div>
 </div>
 
+<!-- Content -->
+<div class="content">
+<div class="fc-tabs">
+<button class="fc-tab active" onclick="setFC(1,this)">FC01 Read Coils</button>
+<button class="fc-tab" onclick="setFC(2,this)">FC02 Read Discrete</button>
+<button class="fc-tab" onclick="setFC(3,this)">FC03 Read Holding</button>
+<button class="fc-tab" onclick="setFC(4,this)">FC04 Read Input</button>
+<button class="fc-tab write" onclick="setFC(5,this)">FC05 Write Coil</button>
+<button class="fc-tab write" onclick="setFC(6,this)">FC06 Write Register</button>
+<button class="fc-tab write" onclick="setFC(15,this)">FC15 Write Coils</button>
+<button class="fc-tab write" onclick="setFC(16,this)">FC16 Write Registers</button>
+</div>
+<div class="query-panel"><div class="panel-header"><h3><span id="fcName">Read Coils</span><span class="fc-badge" id="fcBadge">FC 01</span></h3></div>
+<div class="write-value-group" id="writeGroup" style="display:none"><h4>Write Value(s)</h4><div class="form-group"><label id="writeLabel">Value</label><input type="text" id="writeValue" placeholder="Enter value(s)..."></div><div style="font-size:11px;color:var(--text-muted);margin-top:6px" id="writeHint"></div></div>
+<div class="send-btn-row"><button class="btn btn-primary" onclick="sendQuery()" style="max-width:200px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Send Query</button></div></div>
+
+<div class="collapsible" id="sectionResponse"><div class="collapsible-header" onclick="toggleSection('sectionResponse')"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h4"/></svg>Response Data</h3><div class="collapsible-header-right"><div class="response-meta" id="responseMeta" style="display:none"><span>⏱<span id="respTime">--</span>ms</span> <span>📦<span id="respBytes">--</span>b</span> <span>Slave <span id="respSlave">--</span></span><span class="offset-indicator" id="offsetIndicator">Offset:<span id="offsetDisplay">0</span></span></div><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+<div class="collapsible-body"><div id="emptyState" class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h4"/></svg><p>No data yet</p><small>Connect and send a query to see results.</small></div><div id="errorState" class="error-state" style="display:none"><div class="error-icon">⚠️</div><div class="error-title" id="errorTitle">Error</div><div class="error-detail" id="errorDetail"></div></div><div class="response-table-inner"><table id="responseTable" style="display:none"><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table></div></div></div>
+
+<div class="collapsible collapsed" id="sectionDtype" style="display:none"><div class="collapsible-header" onclick="toggleSection('sectionDtype')"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Data Type per Register</h3><div class="collapsible-header-right"><div class="dtype-bar-actions"><button class="secondary-action" onclick="event.stopPropagation();copyFirstToAll()">Copy #1→All</button><button onclick="event.stopPropagation();reRender()">Apply</button></div><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+<div class="collapsible-body"><div class="dtype-grid" id="dtypeGrid" style="padding:12px 16px"></div><div class="byte-order-row"><label>Byte Order:</label><select id="byteOrder" onchange="reRender()"><option value="AB" selected>Big-Endian (AB CD)</option><option value="BA">Little-Endian (BA DC)</option><option value="CDAB">Mid-Big (CD AB)</option><option value="DCBA">Mid-Little (DC BA)</option></select></div></div></div>
+
+<div class="collapsible collapsed" id="sectionRaw" style="display:none"><div class="collapsible-header" onclick="toggleSection('sectionRaw')"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Raw Response Frame</h3><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="collapsible-body"><div class="raw-frame-body"><div class="raw-row"><span class="raw-tag">HEX</span><span class="raw-hex-data" id="rawHex"></span></div><div class="raw-row"><span class="raw-tag">BIN</span><span class="raw-bin-data" id="rawBin"></span></div><div class="raw-row"><span class="raw-tag">ASCII</span><span class="raw-ascii-data" id="rawAscii"></span></div></div></div></div>
+
+<div class="collapsible" id="sectionLog"><div class="collapsible-header" onclick="toggleSection('sectionLog')"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Communication Log <span class="log-count" id="logCount">0</span></h3><div class="collapsible-header-right"><button class="btn btn-secondary" style="width:auto;padding:4px 10px;font-size:11px" onclick="event.stopPropagation();clearLog();">Clear</button><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+<div class="collapsible-body"><div class="log-body" id="logBody"></div></div></div>
+</div></div></div>
+
 <script>
-// ─── State ────────────────────────────────────────────────
-let port = null, reader = null, writer = null, connected = false;
-let currentFC = 1, pollingTimer = null, isPolling = false;
-let logEntries = 0, logCollapsed = false;
-let lastResponse = null;
+// ─── State ───────────────────────────────────────────
+let port=null,writer=null,connected=false,currentFC=1,pollingTimer=null,isPolling=false;
+let logEntries=0,lastResponse=null,registerTypes={},activeProfile=null;
 
-// Per-register data types. Key = register index, Value = type string
-let registerTypes = {};
-
-// ─── Data Type Definitions ───────────────────────────────
-// Each type: { label, regSpan (how many 16-bit regs it consumes), decode(regs, byteOrder) }
-const DATA_TYPES = {
-  'int8':     { label: '8-bit INT',     regSpan: 1 },
-  'int16':    { label: '16-bit INT',    regSpan: 1 },
-  'int32':    { label: '32-bit INT',    regSpan: 2 },
-  'uint8':    { label: '8-bit UINT',    regSpan: 1 },
-  'uint16':   { label: '16-bit UINT',   regSpan: 1 },
-  'uint32':   { label: '32-bit UINT',   regSpan: 2 },
-  'uint64':   { label: '64-bit UINT',   regSpan: 4 },
-  'float32':  { label: '32-bit Float',  regSpan: 2 },
-  'float64':  { label: '64-bit Float',  regSpan: 4 },
-  'string4':  { label: 'String4 (32b)', regSpan: 2 },
-  'string6':  { label: 'String6 (48b)', regSpan: 3 },
-  'string8':  { label: 'String8 (64b)', regSpan: 4 },
-  'string12': { label: 'String12',      regSpan: 6 },
-  'string16': { label: 'String16',      regSpan: 8 },
-};
-
-function getByteOrder() {
-  return document.getElementById('byteOrder').value;
-}
-
-// Reorder bytes from register array based on byte order setting
-function reorderBytes(regs, byteOrder) {
-  // regs is array of 16-bit values; build raw byte array first (big-endian per register)
-  const bytes = [];
-  for (const r of regs) {
-    bytes.push((r >> 8) & 0xFF, r & 0xFF);
-  }
-  const len = bytes.length;
-  if (byteOrder === 'AB') return bytes; // already big-endian
-  if (byteOrder === 'BA') {
-    // swap each pair
-    const out = [];
-    for (let i = 0; i < len; i += 2) out.push(bytes[i+1], bytes[i]);
-    return out;
-  }
-  if (byteOrder === 'CDAB') {
-    // word-swap: swap 16-bit word pairs
-    const out = [...bytes];
-    for (let i = 0; i + 3 < len; i += 4) {
-      [out[i], out[i+1], out[i+2], out[i+3]] = [out[i+2], out[i+3], out[i], out[i+1]];
-    }
-    return out;
-  }
-  if (byteOrder === 'DCBA') {
-    // full reverse in 4-byte groups
-    const out = [...bytes];
-    for (let i = 0; i + 3 < len; i += 4) {
-      [out[i], out[i+1], out[i+2], out[i+3]] = [out[i+3], out[i+2], out[i+1], out[i]];
-    }
-    return out;
-  }
-  return bytes;
-}
-
-function decodeValue(type, regs, byteOrder) {
-  const def = DATA_TYPES[type];
-  if (!def) return '?';
-  const needed = def.regSpan;
-  if (regs.length < needed) return 'N/A (need ' + needed + ' regs)';
-
-  const bytes = reorderBytes(regs.slice(0, needed), byteOrder);
-  const buf = new ArrayBuffer(bytes.length);
-  const view = new DataView(buf);
-  for (let i = 0; i < bytes.length; i++) view.setUint8(i, bytes[i]);
-
-  switch (type) {
-    case 'int8':    return view.getInt8(0).toString();
-    case 'int16':   return view.getInt16(0).toString();
-    case 'int32':   return view.getInt32(0).toString();
-    case 'uint8':   return view.getUint8(0).toString();
-    case 'uint16':  return view.getUint16(0).toString();
-    case 'uint32':  return view.getUint32(0).toString();
-    case 'uint64': {
-      const hi = BigInt(view.getUint32(0)) << 32n;
-      const lo = BigInt(view.getUint32(4));
-      return (hi | lo).toString();
-    }
-    case 'float32': {
-      const f = view.getFloat32(0);
-      return (isNaN(f) || !isFinite(f)) ? 'NaN/Inf' : f.toPrecision(7);
-    }
-    case 'float64': {
-      const f = view.getFloat64(0);
-      return (isNaN(f) || !isFinite(f)) ? 'NaN/Inf' : f.toPrecision(10);
-    }
-    case 'string4':
-    case 'string6':
-    case 'string8':
-    case 'string12':
-    case 'string16': {
-      let s = '';
-      for (let i = 0; i < bytes.length; i++) {
-        const b = bytes[i];
-        s += (b >= 32 && b <= 126) ? String.fromCharCode(b) : (b === 0 ? '' : '·');
-      }
-      return '"' + s + '"';
-    }
-    default: return '?';
-  }
-}
-
-// ─── CRC16 Modbus ────────────────────────────────────────
-function crc16(buffer) {
-  let crc = 0xFFFF;
-  for (let i = 0; i < buffer.length; i++) {
-    crc ^= buffer[i];
-    for (let j = 0; j < 8; j++) {
-      if (crc & 1) crc = (crc >> 1) ^ 0xA001;
-      else crc >>= 1;
-    }
-  }
-  return crc;
-}
-
-function appendCRC(frame) {
-  const crc = crc16(frame);
-  const full = new Uint8Array(frame.length + 2);
-  full.set(frame);
-  full[frame.length] = crc & 0xFF;
-  full[frame.length + 1] = (crc >> 8) & 0xFF;
-  return full;
-}
-
-function verifyCRC(data) {
-  if (data.length < 4) return false;
-  const payload = data.slice(0, data.length - 2);
-  const received = data[data.length - 2] | (data[data.length - 1] << 8);
-  return crc16(payload) === received;
-}
-
-// ─── Minus Offset ────────────────────────────────────────
-function getWireAddress(startAddr) {
-  const enabled = document.getElementById('minusOffsetEnabled').checked;
-  if (!enabled) return startAddr;
-  const offset = parseInt(document.getElementById('minusOffset').value) || 0;
-  return Math.max(0, Math.min(65535, startAddr - offset));
-}
-
-function updateOffsetUI() {
-  const enabled = document.getElementById('minusOffsetEnabled').checked;
-  const offset = parseInt(document.getElementById('minusOffset').value) || 0;
-  const indicator = document.getElementById('offsetIndicator');
-  const display = document.getElementById('offsetDisplay');
-  if (enabled && offset !== 0) {
-    indicator.classList.add('visible');
-    display.textContent = '−' + offset;
-  } else {
-    indicator.classList.remove('visible');
-  }
-  updateWirePreview();
-}
-
-function updateWirePreview() {
-  const enabled = document.getElementById('minusOffsetEnabled').checked;
-  const preview = document.getElementById('wireAddrPreview');
-  if (!enabled) { preview.classList.remove('visible'); return; }
-  const startAddr = parseInt(document.getElementById('startAddr').value) || 0;
-  const wireAddr = getWireAddress(startAddr);
-  preview.classList.add('visible');
-  preview.innerHTML = `Display: <b>${startAddr}</b> → Wire: <b>${wireAddr}</b> (0x${wireAddr.toString(16).toUpperCase().padStart(4, '0')})`;
-}
-
-// ─── Frame Builders ──────────────────────────────────────
-function buildReadFrame(slaveId, fc, wireAddr, quantity) {
-  const f = new Uint8Array(6);
-  f[0]=slaveId; f[1]=fc;
-  f[2]=(wireAddr>>8)&0xFF; f[3]=wireAddr&0xFF;
-  f[4]=(quantity>>8)&0xFF; f[5]=quantity&0xFF;
-  return appendCRC(f);
-}
-
-function buildWriteSingleCoilFrame(slaveId, wireAddr, value) {
-  const f = new Uint8Array(6);
-  f[0]=slaveId; f[1]=5;
-  f[2]=(wireAddr>>8)&0xFF; f[3]=wireAddr&0xFF;
-  f[4]=value?0xFF:0x00; f[5]=0x00;
-  return appendCRC(f);
-}
-
-function buildWriteSingleRegFrame(slaveId, wireAddr, value) {
-  const f = new Uint8Array(6);
-  f[0]=slaveId; f[1]=6;
-  f[2]=(wireAddr>>8)&0xFF; f[3]=wireAddr&0xFF;
-  f[4]=(value>>8)&0xFF; f[5]=value&0xFF;
-  return appendCRC(f);
-}
-
-function buildWriteMultipleCoilsFrame(slaveId, wireAddr, values) {
-  const qty = values.length, byteCount = Math.ceil(qty / 8);
-  const f = new Uint8Array(7 + byteCount);
-  f[0]=slaveId; f[1]=15;
-  f[2]=(wireAddr>>8)&0xFF; f[3]=wireAddr&0xFF;
-  f[4]=(qty>>8)&0xFF; f[5]=qty&0xFF; f[6]=byteCount;
-  for (let i=0; i<qty; i++) { if (values[i]) f[7+Math.floor(i/8)] |= (1<<(i%8)); }
-  return appendCRC(f);
-}
-
-function buildWriteMultipleRegsFrame(slaveId, wireAddr, values) {
-  const qty = values.length, byteCount = qty * 2;
-  const f = new Uint8Array(7 + byteCount);
-  f[0]=slaveId; f[1]=16;
-  f[2]=(wireAddr>>8)&0xFF; f[3]=wireAddr&0xFF;
-  f[4]=(qty>>8)&0xFF; f[5]=qty&0xFF; f[6]=byteCount;
-  for (let i=0; i<qty; i++) { f[7+i*2]=(values[i]>>8)&0xFF; f[8+i*2]=values[i]&0xFF; }
-  return appendCRC(f);
-}
-
-// ─── Serial Connection ───────────────────────────────────
-async function toggleConnection() {
-  if (connected) return;
-  try {
-    if (!('serial' in navigator)) { addLog('err','Web Serial API not supported.'); alert('Web Serial API not supported.'); return; }
-    port = await navigator.serial.requestPort();
-    const baudRate = parseInt(document.getElementById('baudRate').value);
-    const dataBits = parseInt(document.getElementById('dataBits').value);
-    const stopBits = parseInt(document.getElementById('stopBits').value);
-    const parity = document.getElementById('parity').value;
-    await port.open({ baudRate, dataBits, stopBits, parity });
-    writer = port.writable.getWriter();
-    connected = true;
-    updateConnectionUI(true);
-    addLog('tx', `Connected @ ${baudRate} ${dataBits}${parity[0].toUpperCase()}${stopBits}`);
-  } catch (err) { addLog('err', `Connection failed: ${err.message}`); }
-}
-
-async function disconnect() {
-  try {
-    if (isPolling) togglePolling();
-    if (writer) { writer.releaseLock(); writer = null; }
-    if (port) { await port.close(); port = null; }
-    connected = false; updateConnectionUI(false); addLog('err', 'Disconnected');
-  } catch (err) { addLog('err', `Disconnect error: ${err.message}`); connected = false; updateConnectionUI(false); }
-}
-
-function updateConnectionUI(c) {
-  const dot = document.getElementById('statusDot'), text = document.getElementById('statusText');
-  const btnC = document.getElementById('btnConnect'), btnD = document.getElementById('btnDisconnect');
-  if (c) { dot.classList.add('connected'); text.textContent='Connected'; btnC.style.display='none'; btnD.style.display='flex'; }
-  else { dot.classList.remove('connected'); text.textContent='Disconnected'; btnC.style.display='flex'; btnD.style.display='none'; }
-}
-
-// ─── Read Response ───────────────────────────────────────
-async function readResponse(expectedMinLen) {
-  const timeout = parseInt(document.getElementById('timeout').value) || 1000;
-  const buffer = [];
-  const tempReader = port.readable.getReader();
-  let done = false;
-  const timer = setTimeout(() => { done = true; }, timeout);
-  try {
-    while (!done) {
-      const { value, done: streamDone } = await Promise.race([
-        tempReader.read(),
-        new Promise(r => setTimeout(() => r({ value: null, done: true }), timeout))
-      ]);
-      if (streamDone || value === null) break;
-      buffer.push(...value);
-      if (buffer.length >= expectedMinLen) {
-        await new Promise(r => setTimeout(r, 50));
-        const { value: extra } = await Promise.race([
-          tempReader.read(),
-          new Promise(r => setTimeout(() => r({ value: null, done: true }), 80))
-        ]);
-        if (extra) buffer.push(...extra);
-        break;
-      }
-    }
-  } finally { clearTimeout(timer); tempReader.releaseLock(); }
-  return new Uint8Array(buffer);
-}
-
-// ─── Data Type Grid ──────────────────────────────────────
-function buildDtypeGrid(regCount, displayStartAddr) {
-  const grid = document.getElementById('dtypeGrid');
-  const bar = document.getElementById('dtypeBar');
-  grid.innerHTML = '';
-  bar.classList.add('visible');
-
-  const typeOptions = Object.entries(DATA_TYPES).map(([k,v]) =>
-    `<option value="${k}">${v.label}</option>`
-  ).join('');
-
-  for (let i = 0; i < regCount; i++) {
-    const addr = displayStartAddr + i;
-    const current = registerTypes[i] || 'uint16';
-    const div = document.createElement('div');
-    div.className = 'dtype-item';
-    div.innerHTML = `
-      <span class="dtype-addr">${addr}</span>
-      <select data-reg="${i}" onchange="registerTypes[${i}]=this.value; reRender();">
-        ${typeOptions}
-      </select>
-    `;
-    const sel = div.querySelector('select');
-    sel.value = current;
-    if (!registerTypes[i]) registerTypes[i] = 'uint16';
-    grid.appendChild(div);
-  }
-}
-
-function copyFirstToAll() {
-  const firstType = registerTypes[0] || 'uint16';
-  const regCount = lastResponse ? (lastResponse.regValues ? lastResponse.regValues.length : 0) : 0;
-  for (let i = 0; i < regCount; i++) registerTypes[i] = firstType;
-  // Update all selects
-  document.querySelectorAll('#dtypeGrid select').forEach(sel => { sel.value = firstType; });
-  reRender();
-}
-
-function reRender() {
-  if (lastResponse && (lastResponse.fc === 3 || lastResponse.fc === 4)) {
-    displayResponse(lastResponse.fc, lastResponse.data, lastResponse.displayStartAddr, lastResponse.quantity, lastResponse.elapsed);
-  }
-}
-
-// ─── Send Query ──────────────────────────────────────────
-async function sendQuery() {
-  if (!connected) { addLog('err', 'Not connected.'); return; }
-  const slaveId = parseInt(document.getElementById('slaveId').value);
-  const displayStartAddr = parseInt(document.getElementById('startAddr').value);
-  const wireAddr = getWireAddress(displayStartAddr);
-  const quantity = parseInt(document.getElementById('quantity').value);
-  const fc = currentFC;
-  let frame, expectedMinLen;
-
-  try {
-    if (fc===1||fc===2) { frame=buildReadFrame(slaveId,fc,wireAddr,quantity); expectedMinLen=5+Math.ceil(quantity/8); }
-    else if (fc===3||fc===4) { frame=buildReadFrame(slaveId,fc,wireAddr,quantity); expectedMinLen=5+quantity*2; }
-    else if (fc===5) {
-      const val=document.getElementById('writeValue').value.trim();
-      frame=buildWriteSingleCoilFrame(slaveId,wireAddr,val==='1'||val.toLowerCase()==='true'||val==='on'||val==='ff00');
-      expectedMinLen=8;
-    } else if (fc===6) {
-      const val=parseInt(document.getElementById('writeValue').value.trim());
-      if (isNaN(val)||val<0||val>65535) { addLog('err','Invalid register value (0-65535)'); return; }
-      frame=buildWriteSingleRegFrame(slaveId,wireAddr,val); expectedMinLen=8;
-    } else if (fc===15) {
-      const vals=document.getElementById('writeValue').value.trim().split(/[\s,]+/).map(v=>v==='1'||v.toLowerCase()==='true');
-      frame=buildWriteMultipleCoilsFrame(slaveId,wireAddr,vals); expectedMinLen=8;
-    } else if (fc===16) {
-      const vals=document.getElementById('writeValue').value.trim().split(/[\s,]+/).map(v=>parseInt(v));
-      if (vals.some(v=>isNaN(v))) { addLog('err','Invalid register values'); return; }
-      frame=buildWriteMultipleRegsFrame(slaveId,wireAddr,vals); expectedMinLen=8;
-    }
-
-    const offsetEnabled=document.getElementById('minusOffsetEnabled').checked;
-    const addrInfo=offsetEnabled&&wireAddr!==displayStartAddr?`Addr=${displayStartAddr}→Wire=${wireAddr}`:`Addr=${wireAddr}`;
-    addLog('tx', `[${fcNames[fc]}] Slave=${slaveId} ${addrInfo} Qty=${quantity}  →  ${toHexStr(frame)}`);
-
-    const startTime = performance.now();
-    await writer.write(frame);
-    const response = await readResponse(expectedMinLen);
-    const elapsed = (performance.now() - startTime).toFixed(1);
-
-    if (response.length===0) { addLog('err','No response (timeout)'); return; }
-    addLog('rx', `${toHexStr(response)}  (${elapsed}ms, ${response.length} bytes)`);
-    if (!verifyCRC(response)) { addLog('err','CRC check failed!'); return; }
-    if (response[1]&0x80) {
-      const excCode=response[2];
-      const excNames={1:'Illegal Function',2:'Illegal Data Address',3:'Illegal Data Value',4:'Slave Device Failure'};
-      addLog('err',`Exception: ${excNames[excCode]||'Unknown'} (code ${excCode})`); return;
-    }
-
-    showRawFrame(response);
-    displayResponse(fc, response, displayStartAddr, quantity, elapsed);
-  } catch (err) { addLog('err', `Query error: ${err.message}`); }
-}
-
-// ─── Raw Frame Display ───────────────────────────────────
-function showRawFrame(data) {
-  document.getElementById('rawFramePanel').style.display = 'block';
-  document.getElementById('rawHex').textContent = toHexStr(data);
-  document.getElementById('rawBin').textContent = Array.from(data).map(b=>b.toString(2).padStart(8,'0')).join(' ');
-  document.getElementById('rawAscii').textContent = Array.from(data).map(b=>(b>=32&&b<=126)?String.fromCharCode(b):'·').join('');
-}
-
-// ─── Display Response ────────────────────────────────────
-function displayResponse(fc, data, displayStartAddr, quantity, elapsed) {
-  const meta=document.getElementById('responseMeta');
-  const table=document.getElementById('responseTable');
-  const empty=document.getElementById('emptyState');
-  const head=document.getElementById('tableHead');
-  const body=document.getElementById('tableBody');
-  const dtypeBar=document.getElementById('dtypeBar');
-
-  meta.style.display='flex';
-  document.getElementById('respTime').textContent=elapsed;
-  document.getElementById('respBytes').textContent=data.length;
-  document.getElementById('respSlave').textContent=data[0];
-  empty.style.display='none';
-  table.style.display='table';
-  body.innerHTML='';
-
-  if (fc===1||fc===2) {
-    // ── Coil / Discrete ──
-    dtypeBar.classList.remove('visible');
-    head.innerHTML='<tr><th>Address</th><th>Value</th><th>State</th><th>Hex</th><th>Binary</th></tr>';
-    for (let i=0; i<quantity; i++) {
-      const val=(data[3+Math.floor(i/8)]>>(i%8))&1;
-      const tr=document.createElement('tr'); tr.className='fade-in'; tr.style.animationDelay=`${i*15}ms`;
-      tr.innerHTML=`
-        <td class="addr">${displayStartAddr+i}</td>
-        <td class="${val?'bool-true':'bool-false'}">${val}</td>
-        <td class="${val?'bool-true':'bool-false'}">${val?'ON':'OFF'}</td>
-        <td class="hex">0x${val.toString(16).toUpperCase().padStart(2,'0')}</td>
-        <td class="bin">${val.toString(2)}</td>`;
-      body.appendChild(tr);
-    }
-
-  } else if (fc===3||fc===4) {
-    // ── Registers ──
-    const byteCount=data[2], regCount=byteCount/2;
-    const regValues=[];
-    for (let i=0; i<regCount; i++) regValues.push((data[3+i*2]<<8)|data[4+i*2]);
-
-    // Cache for re-render
-    lastResponse = { fc, data, displayStartAddr, quantity, elapsed, regValues };
-
-    // Build dtype grid
-    buildDtypeGrid(regCount, displayStartAddr);
-
-    // Build table header
-    head.innerHTML='<tr><th>Address</th><th>Raw (U16)</th><th>Hex</th><th>Type</th><th>Interpreted Value</th></tr>';
-
-    const byteOrder = getByteOrder();
-    let i = 0;
-    while (i < regCount) {
-      const type = registerTypes[i] || 'uint16';
-      const def = DATA_TYPES[type];
-      const span = def ? def.regSpan : 1;
-      const availRegs = regValues.slice(i, i + span);
-      const decoded = decodeValue(type, availRegs, byteOrder);
-
-      // First row of this group: show all info
-      const tr = document.createElement('tr');
-      tr.className = 'fade-in';
-      tr.style.animationDelay = `${i * 15}ms`;
-      const rawU16 = regValues[i];
-      tr.innerHTML = `
-        <td class="addr">${displayStartAddr + i}</td>
-        <td class="val">${rawU16}</td>
-        <td class="hex">0x${rawU16.toString(16).toUpperCase().padStart(4,'0')}</td>
-        <td>${def ? def.label : type}</td>
-        <td class="interpreted">${escapeHtml(decoded)}</td>`;
-      body.appendChild(tr);
-
-      // If multi-register type, show continuation rows
-      for (let j = 1; j < span && (i + j) < regCount; j++) {
-        const tr2 = document.createElement('tr');
-        tr2.className = 'fade-in';
-        tr2.style.animationDelay = `${(i+j) * 15}ms`;
-        const rawU16b = regValues[i + j];
-        tr2.innerHTML = `
-          <td class="addr">${displayStartAddr + i + j}</td>
-          <td class="val">${rawU16b}</td>
-          <td class="hex">0x${rawU16b.toString(16).toUpperCase().padStart(4,'0')}</td>
-          <td class="span-note">↑ part of ${def.label}</td>
-          <td class="span-note">—</td>`;
-        body.appendChild(tr2);
-      }
-
-      i += span;
-    }
-    return; // already cached above
-
-  } else if (fc===5||fc===6||fc===15||fc===16) {
-    // ── Write Responses ──
-    dtypeBar.classList.remove('visible');
-    head.innerHTML='<tr><th>Field</th><th>Value</th><th>Hex</th></tr>';
-    const respAddr=(data[2]<<8|data[3]), valRaw=(data[4]<<8|data[5]);
-    const info=[
-      ['Slave ID', data[0], `0x${data[0].toString(16).toUpperCase().padStart(2,'0')}`],
-      ['Function Code', data[1], `0x${data[1].toString(16).toUpperCase().padStart(2,'0')}`],
-      ['Address (wire)', respAddr, `0x${respAddr.toString(16).toUpperCase().padStart(4,'0')}`],
-      ['Address (display)', displayStartAddr, '—'],
-      [fc===5||fc===15?'Coil Value':'Register Value', valRaw, `0x${valRaw.toString(16).toUpperCase().padStart(4,'0')}`],
-      ['Status', 'Success ✓', '—'],
-    ];
-    info.forEach(([field,val,hex],i) => {
-      const tr=document.createElement('tr'); tr.className='fade-in'; tr.style.animationDelay=`${i*30}ms`;
-      tr.innerHTML=`<td>${field}</td><td class="val">${val}</td><td class="hex">${hex}</td>`;
-      body.appendChild(tr);
-    });
-  }
-
-  // Cache for non-register FCs
-  lastResponse = { fc, data, displayStartAddr, quantity, elapsed };
-}
-
-function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-// ─── FC Management ───────────────────────────────────────
+const DATA_TYPES={int8:{label:'8-bit INT',regSpan:1},int16:{label:'16-bit INT',regSpan:1},int32:{label:'32-bit INT',regSpan:2},uint8:{label:'8-bit UINT',regSpan:1},uint16:{label:'16-bit UINT',regSpan:1},uint32:{label:'32-bit UINT',regSpan:2},uint64:{label:'64-bit UINT',regSpan:4},float32:{label:'32-bit Float',regSpan:2},float64:{label:'64-bit Float',regSpan:4},string4:{label:'String4',regSpan:2},string6:{label:'String6',regSpan:3},string8:{label:'String8',regSpan:4},string12:{label:'String12',regSpan:6},string16:{label:'String16',regSpan:8}};
+const FC_TO_ENTRY={1:'coil',2:'discrete',3:'holding',4:'input',5:'coil',6:'holding',15:'coil',16:'holding'};
 const fcNames={1:'Read Coils',2:'Read Discrete Inputs',3:'Read Holding Registers',4:'Read Input Registers',5:'Write Single Coil',6:'Write Single Register',15:'Write Multiple Coils',16:'Write Multiple Registers'};
 const writeFCs=[5,6,15,16];
 
-function setFC(fc, tabEl) {
-  currentFC=fc;
-  document.querySelectorAll('.fc-tab').forEach(t=>t.classList.remove('active'));
-  tabEl.classList.add('active');
-  document.getElementById('fcName').textContent=fcNames[fc];
-  const badge=document.getElementById('fcBadge');
-  badge.textContent=`FC ${fc.toString().padStart(2,'0')}`;
-  badge.className=writeFCs.includes(fc)?'fc-badge write':'fc-badge';
-  const writeGroup=document.getElementById('writeGroup');
-  const writeLabel=document.getElementById('writeLabel');
-  const writeHint=document.getElementById('writeHint');
-  const writeValue=document.getElementById('writeValue');
-  if (writeFCs.includes(fc)) {
-    writeGroup.style.display='block';
-    if (fc===5) { writeLabel.textContent='Coil Value'; writeValue.placeholder='1 or 0'; writeHint.textContent='Enter 1/true/on for ON, 0/false/off for OFF.'; }
-    else if (fc===6) { writeLabel.textContent='Register Value (0-65535)'; writeValue.placeholder='e.g. 1234'; writeHint.textContent='Single unsigned 16-bit integer.'; }
-    else if (fc===15) { writeLabel.textContent='Coil Values'; writeValue.placeholder='1,0,1,1,0,1'; writeHint.textContent='Comma/space separated 1/0 values.'; }
-    else if (fc===16) { writeLabel.textContent='Register Values'; writeValue.placeholder='100, 200, 300'; writeHint.textContent='Comma/space separated 16-bit integers.'; }
-  } else { writeGroup.style.display='none'; }
-}
+// ─── Byte Reorder & Decode ───────────────────────────
+function getByteOrder(){return document.getElementById('byteOrder').value}
+function reorderBytes(regs,bo){const b=[];for(const r of regs)b.push((r>>8)&0xFF,r&0xFF);if(bo==='AB')return b;if(bo==='BA'){const o=[];for(let i=0;i<b.length;i+=2)o.push(b[i+1],b[i]);return o}if(bo==='CDAB'){const o=[...b];for(let i=0;i+3<o.length;i+=4){const t0=o[i],t1=o[i+1];o[i]=o[i+2];o[i+1]=o[i+3];o[i+2]=t0;o[i+3]=t1}return o}if(bo==='DCBA'){const o=[...b];for(let i=0;i+3<o.length;i+=4){const t0=o[i],t1=o[i+1],t2=o[i+2],t3=o[i+3];o[i]=t3;o[i+1]=t2;o[i+2]=t1;o[i+3]=t0}return o}return b}
+function decodeValue(type,regs,bo){const def=DATA_TYPES[type];if(!def||regs.length<def.regSpan)return'N/A';const bytes=reorderBytes(regs.slice(0,def.regSpan),bo);const buf=new ArrayBuffer(Math.max(bytes.length,8));const v=new DataView(buf);for(let i=0;i<bytes.length;i++)v.setUint8(i,bytes[i]);switch(type){case'int8':return v.getInt8(0)+'';case'int16':return v.getInt16(0)+'';case'int32':return v.getInt32(0)+'';case'uint8':return v.getUint8(0)+'';case'uint16':return v.getUint16(0)+'';case'uint32':return v.getUint32(0)+'';case'uint64':return((BigInt(v.getUint32(0))<<32n)|BigInt(v.getUint32(4)))+'';case'float32':{const f=v.getFloat32(0);return(isNaN(f)||!isFinite(f))?'NaN/Inf':f.toPrecision(7)}case'float64':{const f=v.getFloat64(0);return(isNaN(f)||!isFinite(f))?'NaN/Inf':f.toPrecision(10)}default:if(type.startsWith('string')){let s='';for(const b of bytes)s+=(b>=32&&b<=126)?String.fromCharCode(b):(b===0?'':'\u00B7');return'"'+s+'"'}return'?'}}
 
-// ─── Polling ─────────────────────────────────────────────
-function togglePolling() {
-  const btn=document.getElementById('btnPoll');
-  if (isPolling) {
-    clearInterval(pollingTimer); pollingTimer=null; isPolling=false;
-    btn.textContent='Start Polling'; btn.classList.remove('btn-danger'); btn.classList.add('btn-secondary');
-    addLog('tx','Polling stopped');
-  } else {
-    if (!connected) { addLog('err','Connect first.'); return; }
-    const interval=parseInt(document.getElementById('pollInterval').value)||1000;
-    isPolling=true; btn.textContent='Stop Polling'; btn.classList.remove('btn-secondary'); btn.classList.add('btn-danger');
-    addLog('tx',`Polling every ${interval}ms`);
-    sendQuery(); pollingTimer=setInterval(sendQuery, interval);
+// ─── CRC16 ───────────────────────────────────────────
+function crc16(buf){let c=0xFFFF;for(let i=0;i<buf.length;i++){c^=buf[i];for(let j=0;j<8;j++)c=(c&1)?(c>>1)^0xA001:c>>1}return c}
+function appendCRC(f){const c=crc16(f),o=new Uint8Array(f.length+2);o.set(f);o[f.length]=c&0xFF;o[f.length+1]=(c>>8)&0xFF;return o}
+function verifyCRC(d){if(d.length<4)return false;return crc16(d.slice(0,d.length-2))===(d[d.length-2]|(d[d.length-1]<<8))}
+
+// ─── Offset ──────────────────────────────────────────
+function getWireAddress(a){if(!document.getElementById('minusOffsetEnabled').checked)return a;return Math.max(0,Math.min(65535,a-(parseInt(document.getElementById('minusOffset').value)||0)))}
+function updateOffsetUI(){const en=document.getElementById('minusOffsetEnabled').checked,o=parseInt(document.getElementById('minusOffset').value)||0,ind=document.getElementById('offsetIndicator');if(en&&o){ind.classList.add('visible');document.getElementById('offsetDisplay').textContent='\u2212'+o}else ind.classList.remove('visible');updateWirePreview()}
+function updateWirePreview(){const en=document.getElementById('minusOffsetEnabled').checked,p=document.getElementById('wireAddrPreview');if(!en){p.classList.remove('visible');return}const a=parseInt(document.getElementById('startAddr').value)||0,w=getWireAddress(a);p.classList.add('visible');p.innerHTML='Display: <b>'+a+'</b> \u2192 Wire: <b>'+w+'</b> (0x'+w.toString(16).toUpperCase().padStart(4,'0')+')'}
+
+// ─── Frame Builders ──────────────────────────────────
+function mkFrame(s,fc,w,q){const f=new Uint8Array(6);f[0]=s;f[1]=fc;f[2]=(w>>8)&0xFF;f[3]=w&0xFF;f[4]=(q>>8)&0xFF;f[5]=q&0xFF;return appendCRC(f)}
+function mkWCoil(s,w,v){const f=new Uint8Array(6);f[0]=s;f[1]=5;f[2]=(w>>8)&0xFF;f[3]=w&0xFF;f[4]=v?0xFF:0;f[5]=0;return appendCRC(f)}
+function mkWReg(s,w,v){const f=new Uint8Array(6);f[0]=s;f[1]=6;f[2]=(w>>8)&0xFF;f[3]=w&0xFF;f[4]=(v>>8)&0xFF;f[5]=v&0xFF;return appendCRC(f)}
+function mkWCoils(s,w,vs){const q=vs.length,bc=Math.ceil(q/8),f=new Uint8Array(7+bc);f[0]=s;f[1]=15;f[2]=(w>>8)&0xFF;f[3]=w&0xFF;f[4]=(q>>8)&0xFF;f[5]=q&0xFF;f[6]=bc;for(let i=0;i<q;i++)if(vs[i])f[7+(i>>3)]|=1<<(i&7);return appendCRC(f)}
+function mkWRegs(s,w,vs){const q=vs.length,f=new Uint8Array(7+q*2);f[0]=s;f[1]=16;f[2]=(w>>8)&0xFF;f[3]=w&0xFF;f[4]=(q>>8)&0xFF;f[5]=q&0xFF;f[6]=q*2;for(let i=0;i<q;i++){f[7+i*2]=(vs[i]>>8)&0xFF;f[8+i*2]=vs[i]&0xFF}return appendCRC(f)}
+
+// ─── Serial ──────────────────────────────────────────
+async function toggleConnection(){if(connected)return;try{if(!('serial' in navigator)){addLog('err','Web Serial not supported.');return}port=await navigator.serial.requestPort();const br=+$('baudRate').value,db=+$('dataBits').value,sb=+$('stopBits').value,p=$('parity').value;await port.open({baudRate:br,dataBits:db,stopBits:sb,parity:p});writer=port.writable.getWriter();connected=true;updateConnUI(true);addLog('tx','Connected @ '+br+' '+db+p[0].toUpperCase()+sb)}catch(e){addLog('err','Connect fail: '+e.message)}}
+async function disconnect(){try{if(isPolling)stopPolling();if(writer){writer.releaseLock();writer=null}if(port){await port.close();port=null}connected=false;updateConnUI(false);addLog('err','Disconnected')}catch(e){addLog('err','Disconnect err: '+e.message);connected=false;updateConnUI(false)}}
+function $(id){return document.getElementById(id)}
+function updateConnUI(c){$('statusDot').classList.toggle('connected',c);$('statusText').textContent=c?'Connected':'Disconnected';$('btnConnect').style.display=c?'none':'flex';$('btnDisconnect').style.display=c?'flex':'none'}
+async function readResp(expMin){const to=+$('timeout').value||1000,buf=[],rd=port.readable.getReader();let done=false;const tm=setTimeout(()=>done=true,to);try{while(!done){const{value,done:sd}=await Promise.race([rd.read(),new Promise(r=>setTimeout(()=>r({value:null,done:true}),to))]);if(sd||!value)break;buf.push(...value);if(buf.length>=expMin){await new Promise(r=>setTimeout(r,50));const{value:ex}=await Promise.race([rd.read(),new Promise(r=>setTimeout(()=>r({value:null,done:true}),80))]);if(ex)buf.push(...ex);break}}}finally{clearTimeout(tm);rd.releaseLock()}return new Uint8Array(buf)}
+
+// ─── Sections ────────────────────────────────────────
+function toggleSection(id){$(id).classList.toggle('collapsed')}
+
+// ─── Profile System ──────────────────────────────────
+function getProfileLabel(fc,addr){if(!activeProfile)return null;const et=FC_TO_ENTRY[fc];const e=activeProfile.entries.find(x=>x.type===et&&x.address===addr);return e?e.label:null}
+function getProfileDataType(fc,addr){if(!activeProfile)return null;const et=FC_TO_ENTRY[fc];const e=activeProfile.entries.find(x=>x.type===et&&x.address===addr);return(e&&e.dataType&&e.dataType!=='default')?e.dataType:null}
+function applyProfileTypes(rc,dsa,fc){for(let i=0;i<rc;i++){const pt=getProfileDataType(fc,dsa+i);if(pt)registerTypes[i]=pt;else if(!registerTypes[i])registerTypes[i]='uint16'}}
+
+function addProfileEntry(type,address,label,dataType){
+  const list=$('profileEntryList'),div=document.createElement('div');
+  div.className='profile-entry';
+  const tOpts=['coil','discrete','holding','input'].map(t=>'<option value="'+t+'"'+(t===(type||'holding')?' selected':'')+'>'+t[0].toUpperCase()+t.slice(1)+'</option>').join('');
+  const dOpts='<option value="default">Default</option>'+Object.entries(DATA_TYPES).map(([k,v])=>'<option value="'+k+'"'+(k===dataType?' selected':'')+'>'+v.label+'</option>').join('');
+  div.innerHTML='<select>'+tOpts+'</select><input type="number" value="'+(address||0)+'" min="0" max="65535"><input type="text" value="'+esc(label||'')+'" placeholder="Label..." style="font-family:Outfit,sans-serif"><select>'+dOpts+'</select><button class="pe-del" onclick="this.parentElement.remove()">\u2715</button>';
+  list.appendChild(div)
+}
+function collectEntries(){const entries=[];document.querySelectorAll('#profileEntryList .profile-entry').forEach(r=>{const s=r.querySelectorAll('select'),inp=r.querySelectorAll('input');entries.push({type:s[0].value,address:+inp[0].value||0,label:inp[1].value.trim(),dataType:s[1].value})});return entries}
+function loadIntoEditor(p){$('profileName').value=p.name||'';$('profileEntryList').innerHTML='';(p.entries||[]).forEach(e=>addProfileEntry(e.type,e.address,e.label,e.dataType))}
+function activateProfile(p){activeProfile=JSON.parse(JSON.stringify(p));$('profileBadge').classList.add('visible');$('profileBadgeName').textContent=p.name||'Unnamed';$('profileBtn').classList.add('profile-active');if(lastResponse)reRender()}
+function clearActiveProfile(){activeProfile=null;$('profileBadge').classList.remove('visible');$('profileBtn').classList.remove('profile-active');if(lastResponse)reRender()}
+function saveCurrentProfile(){const name=$('profileName').value.trim();if(!name){alert('Enter a profile name.');return}const p={name,entries:collectEntries(),savedAt:new Date().toISOString()};const saved=JSON.parse(localStorage.getItem('modbusProfiles')||'[]');const idx=saved.findIndex(x=>x.name===name);if(idx>=0)saved[idx]=p;else saved.push(p);localStorage.setItem('modbusProfiles',JSON.stringify(saved));activateProfile(p);renderSaved();addLog('tx','Profile "'+name+'" saved ('+p.entries.length+' entries)')}
+function exportProfile(){const name=$('profileName').value.trim()||'modbus-profile';const p={name,entries:collectEntries()};const b=new Blob([JSON.stringify(p,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name.replace(/[^a-zA-Z0-9_-]/g,'_')+'.json';a.click();URL.revokeObjectURL(u)}
+function importProfile(ev){const file=ev.target.files[0];if(!file)return;const r=new FileReader();r.onload=function(e){try{const p=JSON.parse(e.target.result);if(!Array.isArray(p.entries))throw new Error('Invalid format');loadIntoEditor(p);activateProfile(p);addLog('tx','Imported "'+p.name+'" ('+p.entries.length+' entries)')}catch(err){alert('Import failed: '+err.message)}};r.readAsText(file);ev.target.value=''}
+function renderSaved(){const saved=JSON.parse(localStorage.getItem('modbusProfiles')||'[]'),list=$('savedProfilesList');if(!saved.length){list.innerHTML='<div class="no-profiles">No saved profiles yet.</div>';return}list.innerHTML=saved.map((p,i)=>'<div class="saved-profile-item"><div><div class="sp-name">'+esc(p.name)+'</div><div class="sp-info">'+p.entries.length+' entries'+(p.savedAt?' \u00B7 '+new Date(p.savedAt).toLocaleDateString():'')+'</div></div><div class="sp-actions"><button class="sp-load" onclick="loadSaved('+i+')">Load</button><button class="sp-del" onclick="delSaved('+i+')">\u2715</button></div></div>').join('')}
+function loadSaved(i){const s=JSON.parse(localStorage.getItem('modbusProfiles')||'[]');if(s[i]){loadIntoEditor(s[i]);activateProfile(s[i])}}
+function delSaved(i){const s=JSON.parse(localStorage.getItem('modbusProfiles')||'[]');if(s[i]&&confirm('Delete "'+s[i].name+'"?')){if(activeProfile&&activeProfile.name===s[i].name)clearActiveProfile();s.splice(i,1);localStorage.setItem('modbusProfiles',JSON.stringify(s));renderSaved()}}
+function openProfile(){$('profileModal').classList.add('visible');renderSaved()}
+function closeProfile(){$('profileModal').classList.remove('visible')}
+function openAbout(){$('aboutModal').classList.add('visible')}
+function closeAbout(){$('aboutModal').classList.remove('visible')}
+
+// ─── Dtype Grid ──────────────────────────────────────
+function buildDtypeGrid(rc,dsa){const grid=$('dtypeGrid');$('sectionDtype').style.display='block';grid.innerHTML='';const opts=Object.entries(DATA_TYPES).map(([k,v])=>'<option value="'+k+'">'+v.label+'</option>').join('');for(let i=0;i<rc;i++){if(!registerTypes[i])registerTypes[i]='uint16';const d=document.createElement('div');d.className='dtype-item';d.innerHTML='<span class="dtype-addr">'+(dsa+i)+'</span><select data-reg="'+i+'" onchange="registerTypes['+i+']=this.value;reRender()">'+opts+'</select>';d.querySelector('select').value=registerTypes[i];grid.appendChild(d)}}
+function copyFirstToAll(){const f=registerTypes[0]||'uint16',rc=lastResponse&&lastResponse.regValues?lastResponse.regValues.length:0;for(let i=0;i<rc;i++)registerTypes[i]=f;document.querySelectorAll('#dtypeGrid select').forEach(s=>s.value=f);reRender()}
+function reRender(){if(lastResponse&&(lastResponse.fc===3||lastResponse.fc===4))displayResponse(lastResponse.fc,lastResponse.data,lastResponse.displayStartAddr,lastResponse.quantity,lastResponse.elapsed)}
+
+// ─── Error Display ───────────────────────────────────
+function showError(t,d){$('emptyState').style.display='none';$('responseTable').style.display='none';$('errorState').style.display='flex';$('errorTitle').textContent=t;$('errorDetail').textContent=d||'';$('sectionDtype').style.display='none';$('sectionRaw').style.display='none'}
+function clearError(){$('errorState').style.display='none'}
+
+// ─── Send Query ──────────────────────────────────────
+async function sendQuery(){
+  if(!connected){addLog('err','Not connected.');return}
+  const sid=+$('slaveId').value,dsa=+$('startAddr').value,wa=getWireAddress(dsa),qty=+$('quantity').value,fc=currentFC;
+  let frame,expMin;
+  try{
+    if(fc<=2){frame=mkFrame(sid,fc,wa,qty);expMin=5+Math.ceil(qty/8)}
+    else if(fc<=4){frame=mkFrame(sid,fc,wa,qty);expMin=5+qty*2}
+    else if(fc===5){const v=$('writeValue').value.trim();frame=mkWCoil(sid,wa,v==='1'||v.toLowerCase()==='true'||v==='on');expMin=8}
+    else if(fc===6){const v=+$('writeValue').value.trim();if(isNaN(v)||v<0||v>65535){showError('Invalid Value','0\u201365535');return}frame=mkWReg(sid,wa,v);expMin=8}
+    else if(fc===15){const vs=$('writeValue').value.trim().split(/[\s,]+/).map(x=>x==='1'||x.toLowerCase()==='true');frame=mkWCoils(sid,wa,vs);expMin=8}
+    else if(fc===16){const vs=$('writeValue').value.trim().split(/[\s,]+/).map(Number);if(vs.some(isNaN)){showError('Invalid','All must be integers');return}frame=mkWRegs(sid,wa,vs);expMin=8}
+    const oe=$('minusOffsetEnabled').checked,ai=oe&&wa!==dsa?'Addr='+dsa+'\u2192Wire='+wa:'Addr='+wa;
+    addLog('tx','['+fcNames[fc]+'] Slave='+sid+' '+ai+' Qty='+qty+' \u2192 '+hex(frame));
+    const t0=performance.now();await writer.write(frame);const resp=await readResp(expMin);const el=(performance.now()-t0).toFixed(1);
+    if(!resp.length){addLog('err','Timeout');showError('Timeout','No response from slave.');return}
+    addLog('rx',hex(resp)+' ('+el+'ms, '+resp.length+'b)');
+    if(!verifyCRC(resp)){addLog('err','CRC failed');showError('CRC Error','Check wiring/baud rate.');return}
+    if(resp[1]&0x80){const ec=resp[2],en={1:'Illegal Function',2:'Illegal Data Address',3:'Illegal Data Value',4:'Slave Device Failure'};addLog('err','Exception: '+(en[ec]||'Unknown')+' ('+ec+')');showError('Exception: '+(en[ec]||'Unknown'),'Code '+ec+', FC='+fc+', Addr='+wa);return}
+    clearError();showRawFrame(resp);displayResponse(fc,resp,dsa,qty,el)
+  }catch(e){addLog('err',e.message);showError('Error',e.message)}
+}
+function showRawFrame(d){$('sectionRaw').style.display='block';$('rawHex').textContent=hex(d);$('rawBin').textContent=Array.from(d).map(b=>b.toString(2).padStart(8,'0')).join(' ');$('rawAscii').textContent=Array.from(d).map(b=>(b>=32&&b<=126)?String.fromCharCode(b):'\u00B7').join('')}
+
+// ─── Display Response ────────────────────────────────
+function displayResponse(fc,data,dsa,qty,elapsed){
+  const tbl=$('responseTable'),head=$('tableHead'),body=$('tableBody');
+  $('responseMeta').style.display='flex';$('respTime').textContent=elapsed;$('respBytes').textContent=data.length;$('respSlave').textContent=data[0];
+  $('emptyState').style.display='none';tbl.style.display='table';body.innerHTML='';
+  const hp=!!activeProfile;
+
+  if(fc===1||fc===2){
+    $('sectionDtype').style.display='none';
+    let hdr='<th>Address</th>';if(hp)hdr+='<th>Label</th>';hdr+='<th>Value</th><th>State</th><th>Hex</th><th>Binary</th>';
+    head.innerHTML='<tr>'+hdr+'</tr>';
+    for(let i=0;i<qty;i++){
+      const v=(data[3+(i>>3)]>>(i&7))&1,addr=dsa+i,lbl=getProfileLabel(fc,addr);
+      const tr=document.createElement('tr');tr.className='fade-in';tr.style.animationDelay=i*15+'ms';
+      let cells='<td class="addr">'+addr+'</td>';
+      if(hp)cells+='<td class="lbl">'+esc(lbl||'\u2014')+'</td>';
+      cells+='<td class="'+(v?'bool-true':'bool-false')+'">'+v+'</td><td class="'+(v?'bool-true':'bool-false')+'">'+(v?'ON':'OFF')+'</td><td class="hex">0x'+v.toString(16).toUpperCase().padStart(2,'0')+'</td><td style="color:var(--text-muted)">'+v.toString(2)+'</td>';
+      tr.innerHTML=cells;body.appendChild(tr)
+    }
+    lastResponse={fc,data,displayStartAddr:dsa,quantity:qty,elapsed}
+
+  }else if(fc===3||fc===4){
+    const bc=data[2],rc=bc/2,rv=[];
+    for(let i=0;i<rc;i++)rv.push((data[3+i*2]<<8)|data[4+i*2]);
+    lastResponse={fc,data,displayStartAddr:dsa,quantity:qty,elapsed,regValues:rv};
+    applyProfileTypes(rc,dsa,fc);buildDtypeGrid(rc,dsa);
+    let hdr='<th>Address</th>';if(hp)hdr+='<th>Label</th>';hdr+='<th>Raw(U16)</th><th>Hex</th><th>Type</th><th>Interpreted</th>';
+    head.innerHTML='<tr>'+hdr+'</tr>';
+    const bo=getByteOrder();let i=0;
+    while(i<rc){
+      const type=registerTypes[i]||'uint16',def=DATA_TYPES[type],span=def?def.regSpan:1;
+      const decoded=decodeValue(type,rv.slice(i,i+span),bo),raw=rv[i],addr=dsa+i,lbl=getProfileLabel(fc,addr);
+      const tr=document.createElement('tr');tr.className='fade-in';tr.style.animationDelay=i*15+'ms';
+      let cells='<td class="addr">'+addr+'</td>';
+      if(hp)cells+='<td class="lbl">'+esc(lbl||'\u2014')+'</td>';
+      cells+='<td class="val">'+raw+'</td><td class="hex">0x'+raw.toString(16).toUpperCase().padStart(4,'0')+'</td><td>'+(def?def.label:type)+'</td><td class="interpreted">'+esc(decoded)+'</td>';
+      tr.innerHTML=cells;body.appendChild(tr);
+      for(let j=1;j<span&&(i+j)<rc;j++){
+        const tr2=document.createElement('tr');tr2.className='fade-in';const ru=rv[i+j],lbl2=getProfileLabel(fc,dsa+i+j);
+        let c2='<td class="addr">'+(dsa+i+j)+'</td>';
+        if(hp)c2+='<td class="lbl">'+esc(lbl2||'\u2014')+'</td>';
+        c2+='<td class="val">'+ru+'</td><td class="hex">0x'+ru.toString(16).toUpperCase().padStart(4,'0')+'</td><td class="span-note">\u2191 '+def.label+'</td><td class="span-note">\u2014</td>';
+        tr2.innerHTML=c2;body.appendChild(tr2)
+      }
+      i+=span
+    }
+
+  }else{
+    $('sectionDtype').style.display='none';
+    head.innerHTML='<tr><th>Field</th><th>Value</th><th>Hex</th></tr>';
+    const ra=(data[2]<<8|data[3]),vr=(data[4]<<8|data[5]);
+    const rows=[['Slave ID',data[0],'0x'+data[0].toString(16).toUpperCase().padStart(2,'0')],['Function Code',data[1],'0x'+data[1].toString(16).toUpperCase().padStart(2,'0')],['Address (wire)',ra,'0x'+ra.toString(16).toUpperCase().padStart(4,'0')],['Address (display)',dsa,'\u2014'],[fc===5||fc===15?'Coil Value':'Reg Value',vr,'0x'+vr.toString(16).toUpperCase().padStart(4,'0')],['Status','Success \u2713','\u2014']];
+    rows.forEach(([f,v,h],i)=>{const tr=document.createElement('tr');tr.className='fade-in';tr.style.animationDelay=i*30+'ms';tr.innerHTML='<td>'+f+'</td><td class="val">'+v+'</td><td class="hex">'+h+'</td>';body.appendChild(tr)});
+    lastResponse={fc,data,displayStartAddr:dsa,quantity:qty,elapsed}
   }
 }
 
-// ─── Logging ─────────────────────────────────────────────
-function addLog(dir, msg) {
-  logEntries++;
-  document.getElementById('logCount').textContent=logEntries;
-  const logBody=document.getElementById('logBody');
-  const now=new Date();
-  const time=`${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}.${now.getMilliseconds().toString().padStart(3,'0')}`;
-  const dirLabel=dir==='tx'?'TX':dir==='rx'?'RX':'!!';
-  const entry=document.createElement('div');
-  entry.className='log-entry fade-in';
-  entry.innerHTML=`<span class="log-time">${time}</span><span class="log-dir ${dir}">${dirLabel}</span><span class="log-msg">${msg}</span>`;
-  logBody.appendChild(entry);
-  logBody.scrollTop=logBody.scrollHeight;
-}
+// ─── FC ──────────────────────────────────────────────
+function setFC(fc,el){currentFC=fc;document.querySelectorAll('.fc-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');$('fcName').textContent=fcNames[fc];const b=$('fcBadge');b.textContent='FC '+String(fc).padStart(2,'0');b.className=writeFCs.includes(fc)?'fc-badge write':'fc-badge';const wg=$('writeGroup'),wl=$('writeLabel'),wh=$('writeHint'),wv=$('writeValue');if(writeFCs.includes(fc)){wg.style.display='block';if(fc===5){wl.textContent='Coil Value';wv.placeholder='1 or 0';wh.textContent='1/true/on for ON, 0/false/off for OFF.'}else if(fc===6){wl.textContent='Register Value (0-65535)';wv.placeholder='e.g. 1234';wh.textContent='Single 16-bit unsigned integer.'}else if(fc===15){wl.textContent='Coil Values';wv.placeholder='1,0,1,1,0,1';wh.textContent='Comma/space separated 1/0.'}else if(fc===16){wl.textContent='Register Values';wv.placeholder='100,200,300';wh.textContent='Comma/space separated integers.'}}else wg.style.display='none'}
 
-function clearLog() { document.getElementById('logBody').innerHTML=''; logEntries=0; document.getElementById('logCount').textContent='0'; }
-function toggleLog() { logCollapsed=!logCollapsed; document.getElementById('logBody').classList.toggle('collapsed',logCollapsed); }
-function toHexStr(arr) { return Array.from(arr).map(b=>b.toString(16).toUpperCase().padStart(2,'0')).join(' '); }
+// ─── Polling ─────────────────────────────────────────
+function togglePolling(){const cb=$('pollingEnabled');if(cb.checked){if(!connected){addLog('err','Connect first.');cb.checked=false;return}const iv=+$('pollInterval').value||1000;isPolling=true;addLog('tx','Polling every '+iv+'ms');sendQuery();pollingTimer=setInterval(sendQuery,iv)}else stopPolling()}
+function stopPolling(){if(pollingTimer){clearInterval(pollingTimer);pollingTimer=null}isPolling=false;$('pollingEnabled').checked=false;addLog('tx','Polling stopped')}
+
+// ─── Log ─────────────────────────────────────────────
+function addLog(dir,msg){logEntries++;$('logCount').textContent=logEntries;const lb=$('logBody'),now=new Date(),t=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0')+'.'+String(now.getMilliseconds()).padStart(3,'0'),dl=dir==='tx'?'TX':dir==='rx'?'RX':'!!',e=document.createElement('div');e.className='log-entry fade-in';e.innerHTML='<span class="log-time">'+t+'</span><span class="log-dir '+dir+'">'+dl+'</span><span class="log-msg">'+msg+'</span>';lb.appendChild(e);lb.scrollTop=lb.scrollHeight}
+function clearLog(){$('logBody').innerHTML='';logEntries=0;$('logCount').textContent='0'}
+
+// ─── Helpers ─────────────────────────────────────────
+function hex(a){return Array.from(a).map(b=>b.toString(16).toUpperCase().padStart(2,'0')).join(' ')}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 </script>
 </body>
 </html>

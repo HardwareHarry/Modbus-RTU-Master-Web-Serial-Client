@@ -69,6 +69,25 @@ A live preview shows the calculated wire address before you send, and the commun
 
 Enable automatic repeated querying at a configurable interval (100ms–60,000ms). Useful for monitoring live values. Toggle on/off with a checkbox — the tool will re-send the current query at each interval.
 
+### Device Profiles
+
+Create named profiles to label registers, coils, and inputs for specific Modbus slave devices. Profiles make the response data table much more readable by showing human-friendly names alongside raw addresses.
+
+Each profile entry defines:
+- **Type** — Coil, Discrete Input, Holding Register, or Input Register
+- **Address** — The register/coil address
+- **Label** — A human-readable name (e.g. "Motor Speed", "Tank Level", "Alarm Status")
+- **Data Type** — Optionally pre-assign a data type (overrides the default uint16 for registers)
+
+Profile management features:
+- **Save** — Stores profiles in the browser's localStorage for persistence across sessions
+- **Export JSON** — Downloads the profile as a `.json` file for backup or sharing
+- **Import JSON** — Loads a previously exported profile file
+- **Load / Delete** — Manage saved profiles from the list in the profile editor
+- **Clear Active** — Removes the currently active profile without deleting it from storage
+
+When a profile is active, a pink badge appears in the header showing the profile name, and a **Label** column is added to the response data table. Profile data types are automatically applied to the per-register type selectors.
+
 ### Raw Response Frame
 
 Every response is displayed in three formats:
@@ -134,6 +153,19 @@ Timestamped log of all TX (sent), RX (received), and error events with full hex 
 3. Select the desired type for each register (or set the first and click **"Copy #1 → All"**)
 4. Choose the byte order if working with multi-byte types
 5. The table updates automatically to show the interpreted values
+
+### Using Device Profiles
+
+1. Click the **"Profiles"** button in the header
+2. Enter a **profile name** (e.g. "Schneider PM5110", "ABB ACS580")
+3. Click **"+ Add Entry"** to define each register/coil label:
+   - Select the type (Coil, Discrete, Holding, Input)
+   - Enter the address number
+   - Type a descriptive label
+   - Optionally choose a data type (for registers)
+4. Click **"Save Profile"** to store it locally and activate it
+5. Send queries as normal — the Label column will now appear in results
+6. To share profiles, use **"Export JSON"** and **"Import JSON"**
 
 ### Using Auto-Polling
 
