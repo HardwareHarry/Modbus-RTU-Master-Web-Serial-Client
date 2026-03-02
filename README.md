@@ -73,11 +73,22 @@ Enable automatic repeated querying at a configurable interval (100ms–60,000ms)
 
 Create named profiles to label registers, coils, and inputs for specific Modbus slave devices. Profiles make the response data table much more readable by showing human-friendly names alongside raw addresses.
 
+Each profile stores:
+- **Profile Name** — Identifies the device (e.g. "Schneider PM5110")
+- **Slave ID** — The device's Modbus address, automatically applied when the profile is loaded
+
 Each profile entry defines:
 - **Type** — Coil, Discrete Input, Holding Register, or Input Register
-- **Address** — The register/coil address
+- **Address** — The register/coil address (using documentation addressing, e.g. 40001)
 - **Label** — A human-readable name (e.g. "Motor Speed", "Tank Level", "Alarm Status")
 - **Data Type** — Optionally pre-assign a data type (overrides the default uint16 for registers)
+
+**Automatic FC tab configuration:** When a profile is active and you click a function code tab, the tool automatically:
+- Sets the **Start Address** to the lowest address defined in the profile for that register type
+- Sets the **Quantity** to cover all defined addresses (accounting for multi-register data types)
+- Enables **Minus Offset** with the standard base address (1 for coils, 10001 for discrete inputs, 30001 for input registers, 40001 for holding registers)
+
+This means you can simply load a profile, click a FC tab, and immediately send a query — no manual address configuration needed.
 
 Profile management features:
 - **Save** — Stores profiles in the browser's localStorage for persistence across sessions
@@ -157,15 +168,16 @@ Timestamped log of all TX (sent), RX (received), and error events with full hex 
 ### Using Device Profiles
 
 1. Click the **"Profiles"** button in the header
-2. Enter a **profile name** (e.g. "Schneider PM5110", "ABB ACS580")
+2. Enter a **profile name** (e.g. "Schneider PM5110") and the device's **Slave ID**
 3. Click **"+ Add Entry"** to define each register/coil label:
    - Select the type (Coil, Discrete, Holding, Input)
-   - Enter the address number
+   - Enter the address number (use documentation addresses, e.g. 40001 for holding register 0)
    - Type a descriptive label
    - Optionally choose a data type (for registers)
 4. Click **"Save Profile"** to store it locally and activate it
-5. Send queries as normal — the Label column will now appear in results
-6. To share profiles, use **"Export JSON"** and **"Import JSON"**
+5. Now simply click any **FC tab** — the start address, quantity, and minus offset are auto-configured from the profile
+6. Click **"Send Query"** — the Label column shows your defined names in results
+7. To share profiles, use **"Export JSON"** and **"Import JSON"**
 
 ### Using Auto-Polling
 

@@ -210,7 +210,7 @@ For more information, please refer to &lt;https://unlicense.org&gt;</div>
 <div class="modal-overlay" id="profileModal" onclick="if(event.target===this)closeProfile()"><div class="modal profile-modal">
 <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>Device Profile Editor</h2>
 <p>Define labels and data types for coils, inputs, and registers. Save profiles locally or export/import as JSON files to share between sessions.</p>
-<div class="profile-name-row"><input type="text" id="profileName" placeholder="Profile name (e.g. Schneider PM5110, ABB ACS580...)"></div>
+<div class="profile-name-row"><input type="text" id="profileName" placeholder="Profile name (e.g. Schneider PM5110, ABB ACS580...)" style="flex:2"><input type="number" id="profileSlaveId" placeholder="Slave ID" min="1" max="247" value="1" style="flex:0.5;min-width:80px"></div>
 <div class="profile-entries" id="profileEntries">
   <div class="profile-entry-header"><span>Type</span><span>Address</span><span>Label</span><span>Data Type</span><span></span></div>
   <div id="profileEntryList"></div>
@@ -345,13 +345,13 @@ function addProfileEntry(type,address,label,dataType){
   list.appendChild(div)
 }
 function collectEntries(){const entries=[];document.querySelectorAll('#profileEntryList .profile-entry').forEach(r=>{const s=r.querySelectorAll('select'),inp=r.querySelectorAll('input');entries.push({type:s[0].value,address:+inp[0].value||0,label:inp[1].value.trim(),dataType:s[1].value})});return entries}
-function loadIntoEditor(p){$('profileName').value=p.name||'';$('profileEntryList').innerHTML='';(p.entries||[]).forEach(e=>addProfileEntry(e.type,e.address,e.label,e.dataType))}
-function activateProfile(p){activeProfile=JSON.parse(JSON.stringify(p));$('profileBadge').classList.add('visible');$('profileBadgeName').textContent=p.name||'Unnamed';$('profileBtn').classList.add('profile-active');if(lastResponse)reRender()}
+function loadIntoEditor(p){$('profileName').value=p.name||'';$('profileSlaveId').value=p.slaveId||1;$('profileEntryList').innerHTML='';(p.entries||[]).forEach(e=>addProfileEntry(e.type,e.address,e.label,e.dataType))}
+function activateProfile(p){activeProfile=JSON.parse(JSON.stringify(p));$('profileBadge').classList.add('visible');$('profileBadgeName').textContent=p.name||'Unnamed';$('profileBtn').classList.add('profile-active');if(p.slaveId)$('slaveId').value=p.slaveId;applyProfileToFC(currentFC);if(lastResponse)reRender()}
 function clearActiveProfile(){activeProfile=null;$('profileBadge').classList.remove('visible');$('profileBtn').classList.remove('profile-active');if(lastResponse)reRender()}
-function saveCurrentProfile(){const name=$('profileName').value.trim();if(!name){alert('Enter a profile name.');return}const p={name,entries:collectEntries(),savedAt:new Date().toISOString()};const saved=JSON.parse(localStorage.getItem('modbusProfiles')||'[]');const idx=saved.findIndex(x=>x.name===name);if(idx>=0)saved[idx]=p;else saved.push(p);localStorage.setItem('modbusProfiles',JSON.stringify(saved));activateProfile(p);renderSaved();addLog('tx','Profile "'+name+'" saved ('+p.entries.length+' entries)')}
-function exportProfile(){const name=$('profileName').value.trim()||'modbus-profile';const p={name,entries:collectEntries()};const b=new Blob([JSON.stringify(p,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name.replace(/[^a-zA-Z0-9_-]/g,'_')+'.json';a.click();URL.revokeObjectURL(u)}
+function saveCurrentProfile(){const name=$('profileName').value.trim();if(!name){alert('Enter a profile name.');return}const p={name,slaveId:+$('profileSlaveId').value||1,entries:collectEntries(),savedAt:new Date().toISOString()};const saved=JSON.parse(localStorage.getItem('modbusProfiles')||'[]');const idx=saved.findIndex(x=>x.name===name);if(idx>=0)saved[idx]=p;else saved.push(p);localStorage.setItem('modbusProfiles',JSON.stringify(saved));activateProfile(p);renderSaved();addLog('tx','Profile "'+name+'" saved ('+p.entries.length+' entries, Slave '+p.slaveId+')')}
+function exportProfile(){const name=$('profileName').value.trim()||'modbus-profile';const p={name,slaveId:+$('profileSlaveId').value||1,entries:collectEntries()};const b=new Blob([JSON.stringify(p,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name.replace(/[^a-zA-Z0-9_-]/g,'_')+'.json';a.click();URL.revokeObjectURL(u)}
 function importProfile(ev){const file=ev.target.files[0];if(!file)return;const r=new FileReader();r.onload=function(e){try{const p=JSON.parse(e.target.result);if(!Array.isArray(p.entries))throw new Error('Invalid format');loadIntoEditor(p);activateProfile(p);addLog('tx','Imported "'+p.name+'" ('+p.entries.length+' entries)')}catch(err){alert('Import failed: '+err.message)}};r.readAsText(file);ev.target.value=''}
-function renderSaved(){const saved=JSON.parse(localStorage.getItem('modbusProfiles')||'[]'),list=$('savedProfilesList');if(!saved.length){list.innerHTML='<div class="no-profiles">No saved profiles yet.</div>';return}list.innerHTML=saved.map((p,i)=>'<div class="saved-profile-item"><div><div class="sp-name">'+esc(p.name)+'</div><div class="sp-info">'+p.entries.length+' entries'+(p.savedAt?' \u00B7 '+new Date(p.savedAt).toLocaleDateString():'')+'</div></div><div class="sp-actions"><button class="sp-load" onclick="loadSaved('+i+')">Load</button><button class="sp-del" onclick="delSaved('+i+')">\u2715</button></div></div>').join('')}
+function renderSaved(){const saved=JSON.parse(localStorage.getItem('modbusProfiles')||'[]'),list=$('savedProfilesList');if(!saved.length){list.innerHTML='<div class="no-profiles">No saved profiles yet.</div>';return}list.innerHTML=saved.map((p,i)=>'<div class="saved-profile-item"><div><div class="sp-name">'+esc(p.name)+'</div><div class="sp-info">'+p.entries.length+' entries \u00B7 Slave '+(p.slaveId||1)+(p.savedAt?' \u00B7 '+new Date(p.savedAt).toLocaleDateString():'')+'</div></div><div class="sp-actions"><button class="sp-load" onclick="loadSaved('+i+')">Load</button><button class="sp-del" onclick="delSaved('+i+')">\u2715</button></div></div>').join('')}
 function loadSaved(i){const s=JSON.parse(localStorage.getItem('modbusProfiles')||'[]');if(s[i]){loadIntoEditor(s[i]);activateProfile(s[i])}}
 function delSaved(i){const s=JSON.parse(localStorage.getItem('modbusProfiles')||'[]');if(s[i]&&confirm('Delete "'+s[i].name+'"?')){if(activeProfile&&activeProfile.name===s[i].name)clearActiveProfile();s.splice(i,1);localStorage.setItem('modbusProfiles',JSON.stringify(s));renderSaved()}}
 function openProfile(){$('profileModal').classList.add('visible');renderSaved()}
@@ -449,8 +449,38 @@ function displayResponse(fc,data,dsa,qty,elapsed){
   }
 }
 
+// ─── Profile Auto-Config on FC Change ────────────────
+// Default base addresses for each entry type
+const FC_BASE_ADDR={1:1,2:10001,3:40001,4:30001,5:1,6:40001,15:1,16:40001};
+function applyProfileToFC(fc){
+  if(!activeProfile)return;
+  const et=FC_TO_ENTRY[fc];if(!et)return;
+  const entries=activeProfile.entries.filter(e=>e.type===et);
+  if(!entries.length)return;
+  // Find the lowest address and count
+  const addrs=entries.map(e=>e.address).sort((a,b)=>a-b);
+  const baseAddr=FC_BASE_ADDR[fc]||0;
+  const startAddr=addrs[0];
+  // Calculate quantity: span from lowest to highest address, accounting for multi-reg types
+  let maxEnd=0;
+  for(const e of entries){
+    const dt=e.dataType&&e.dataType!=='default'?e.dataType:'uint16';
+    const span=DATA_TYPES[dt]?DATA_TYPES[dt].regSpan:1;
+    const end=e.address+span;
+    if(end>maxEnd)maxEnd=end;
+  }
+  const qty=Math.max(1,maxEnd-startAddr);
+  // Set the fields
+  $('startAddr').value=startAddr;
+  $('quantity').value=Math.min(qty,fc<=2?2000:125);
+  // Enable minus offset and set it to the base address
+  $('minusOffsetEnabled').checked=true;
+  $('minusOffset').value=baseAddr;
+  updateOffsetUI();
+}
+
 // ─── FC ──────────────────────────────────────────────
-function setFC(fc,el){currentFC=fc;document.querySelectorAll('.fc-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');$('fcName').textContent=fcNames[fc];const b=$('fcBadge');b.textContent='FC '+String(fc).padStart(2,'0');b.className=writeFCs.includes(fc)?'fc-badge write':'fc-badge';const wg=$('writeGroup'),wl=$('writeLabel'),wh=$('writeHint'),wv=$('writeValue');if(writeFCs.includes(fc)){wg.style.display='block';if(fc===5){wl.textContent='Coil Value';wv.placeholder='1 or 0';wh.textContent='1/true/on for ON, 0/false/off for OFF.'}else if(fc===6){wl.textContent='Register Value (0-65535)';wv.placeholder='e.g. 1234';wh.textContent='Single 16-bit unsigned integer.'}else if(fc===15){wl.textContent='Coil Values';wv.placeholder='1,0,1,1,0,1';wh.textContent='Comma/space separated 1/0.'}else if(fc===16){wl.textContent='Register Values';wv.placeholder='100,200,300';wh.textContent='Comma/space separated integers.'}}else wg.style.display='none'}
+function setFC(fc,el){currentFC=fc;document.querySelectorAll('.fc-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');$('fcName').textContent=fcNames[fc];const b=$('fcBadge');b.textContent='FC '+String(fc).padStart(2,'0');b.className=writeFCs.includes(fc)?'fc-badge write':'fc-badge';const wg=$('writeGroup'),wl=$('writeLabel'),wh=$('writeHint'),wv=$('writeValue');if(writeFCs.includes(fc)){wg.style.display='block';if(fc===5){wl.textContent='Coil Value';wv.placeholder='1 or 0';wh.textContent='1/true/on for ON, 0/false/off for OFF.'}else if(fc===6){wl.textContent='Register Value (0-65535)';wv.placeholder='e.g. 1234';wh.textContent='Single 16-bit unsigned integer.'}else if(fc===15){wl.textContent='Coil Values';wv.placeholder='1,0,1,1,0,1';wh.textContent='Comma/space separated 1/0.'}else if(fc===16){wl.textContent='Register Values';wv.placeholder='100,200,300';wh.textContent='Comma/space separated integers.'}}else wg.style.display='none';applyProfileToFC(fc)}
 
 // ─── Polling ─────────────────────────────────────────
 function togglePolling(){const cb=$('pollingEnabled');if(cb.checked){if(!connected){addLog('err','Connect first.');cb.checked=false;return}const iv=+$('pollInterval').value||1000;isPolling=true;addLog('tx','Polling every '+iv+'ms');sendQuery();pollingTimer=setInterval(sendQuery,iv)}else stopPolling()}
