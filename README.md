@@ -97,7 +97,9 @@ Profile management features:
 - **Load / Delete** — Manage saved profiles from the list in the profile editor
 - **Clear Active** — Removes the currently active profile without deleting it from storage
 
-When a profile is active, a pink badge appears in the header showing the profile name, and a **Label** column is added to the response data table. Profile data types are automatically applied to the per-register type selectors.
+When a profile is active, a pink badge appears in the header showing the profile name, and a **Label** column is added to the response data table. Profile data types are automatically applied to the per-register type selectors. If the profile has no entries for a particular FC tab, an info message is shown with a link to edit the profile — the manual address fields remain available for direct queries.
+
+Switching FC tabs or changing profiles clears the Response Data area, so it's always clear that a fresh query is needed to populate results for the current context.
 
 ### Raw Response Frame
 
@@ -141,7 +143,12 @@ Timestamped log of all TX (sent), RX (received), and error events with full hex 
 
 ## Getting Started
 
-1. **Open** `modbus-master.html` in Chrome or Edge
+1. **Download fonts** — Run the included script to fetch the font files locally (requires `curl`):
+   ```bash
+   chmod +x download-fonts.sh && ./download-fonts.sh
+   ```
+   This creates a `fonts/` directory with the required JetBrains Mono and Outfit woff2 files. Alternatively, download them manually from [JetBrains Mono](https://www.jetbrains.com/lp/mono/) and [Outfit](https://fonts.google.com/specimen/Outfit) and place the woff2 files in `fonts/`.
+2. **Open** `modbus-master.html` in Chrome or Edge
 2. **Configure** serial port settings (baud rate, data bits, stop bits, parity) in the sidebar
 3. **Click "Connect"** — the browser will prompt you to select a serial port
 4. **Set** the slave ID, start address, and quantity
@@ -188,19 +195,31 @@ Timestamped log of all TX (sent), RX (received), and error events with full hex 
 
 ### Write Operations
 
-1. Select a write function code (FC05, FC06, FC15, or FC16)
-2. The **"Write Value(s)"** panel appears with guidance for the expected format:
+1. Select a write function code (FC05, FC06, FC15, or FC16) — the button changes to **"Send Update"**
+2. **With a profile active:** A picker list shows all labelled registers/coils for the selected type. Click to select which ones to write, enter values inline, then click Send Update. For non-contiguous selections (e.g. registers 1 and 3 but not 2), the tool sends individual write commands to avoid overwriting unselected registers.
+3. **Without a profile (or no entries for that type):** The manual value input appears with guidance for the expected format:
    - **FC05 (Single Coil):** `1`, `0`, `true`, `false`, `on`, `off`
    - **FC06 (Single Register):** An integer between 0 and 65535
    - **FC15 (Multiple Coils):** Comma or space-separated `1`/`0` values
    - **FC16 (Multiple Registers):** Comma or space-separated integers (0–65535)
-3. Click **"Send Query"** to execute the write
+4. Click **"Send Update"** to execute the write
+
+Auto-polling is automatically stopped when switching to a write FC tab to prevent accidental repeated writes.
 
 ---
 
 ## File Structure
 
-This is a single self-contained HTML file. There are no external dependencies, build steps, or server requirements. All HTML, CSS, and JavaScript are inline.
+```
+modbus-master.html    — Main application (single self-contained HTML file)
+download-fonts.sh     — Script to fetch font files locally
+README.md             — This file
+fonts/                — Local font files (created by download-fonts.sh)
+  JetBrainsMono-*.woff2
+  Outfit-*.woff2
+```
+
+No external dependencies, build steps, or server required. All HTML, CSS, and JavaScript are inline. Fonts are loaded locally with no external network requests.
 
 ---
 
@@ -218,7 +237,7 @@ This is a single self-contained HTML file. There are no external dependencies, b
 
 ## Acknowledgements
 
-- **Fonts:** [JetBrains Mono](https://www.jetbrains.com/lp/mono/) and [Outfit](https://fonts.google.com/specimen/Outfit) — both licensed under the [SIL Open Font License 1.1](https://scripts.sil.org/OFL)
+- **Fonts:** [JetBrains Mono](https://www.jetbrains.com/lp/mono/) and [Outfit](https://fonts.google.com/specimen/Outfit) — both licensed under the [SIL Open Font License 1.1](https://scripts.sil.org/OFL). Loaded locally from the `fonts/` directory (no external requests to Google Fonts).
 - **Web Serial API:** A native browser API provided by Chromium-based browsers
 
 ---
