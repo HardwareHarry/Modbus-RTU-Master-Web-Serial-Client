@@ -143,12 +143,7 @@ Timestamped log of all TX (sent), RX (received), and error events with full hex 
 
 ## Getting Started
 
-1. **Download fonts** — Run the included script to fetch the font files locally (requires `curl`):
-   ```bash
-   chmod +x download-fonts.sh && ./download-fonts.sh
-   ```
-   This creates a `fonts/` directory with the required JetBrains Mono and Outfit woff2 files. Alternatively, download them manually from [JetBrains Mono](https://www.jetbrains.com/lp/mono/) and [Outfit](https://fonts.google.com/specimen/Outfit) and place the woff2 files in `fonts/`.
-2. **Open** `modbus-master.html` in Chrome or Edge
+1. **Open** `modbus-master.html` in Chrome or Edge
 2. **Configure** serial port settings (baud rate, data bits, stop bits, parity) in the sidebar
 3. **Click "Connect"** — the browser will prompt you to select a serial port
 4. **Set** the slave ID, start address, and quantity
