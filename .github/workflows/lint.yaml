@@ -17,8 +17,10 @@ jobs:
       - name: Install dependencies
         run: |
           npm init -y
-          npm install eslint eslint-plugin-html --save-dev
+          # Added @eslint/js to the install list
+          npm install eslint eslint-plugin-html @eslint/js --save-dev
+          # This ensures Node treats .js files as ESM modules
+          npm pkg set type="module"
 
       - name: Run Analysis
-        # This targets your HTML file specifically
         run: npx eslint "**/*.html"
