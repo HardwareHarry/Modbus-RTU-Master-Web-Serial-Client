@@ -1,6 +1,9 @@
+import html from "eslint-plugin-html";
+
 export default [
   {
-    files: ["**/*.html", "**/*.js"],
+    files: ["**/*.html"],
+    plugins: { html },
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "script",
@@ -39,7 +42,6 @@ export default [
       },
     },
     rules: {
-      // Functions called from HTML onclick/onchange attributes appear unused to ESLint
       "no-unused-vars": ["warn", {
         varsIgnorePattern: "^(toggleConnection|disconnect|toggleSection|saveCurrentProfile|exportProfile|importProfile|loadSaved|delSaved|openProfile|closeProfile|openAbout|closeAbout|sendQuery|setFC|togglePolling|clearLog|addProfileEntry|copyFirstToAll|reRender|clearActiveProfile|updateOffsetUI|updateWirePreview)$"
       }],
