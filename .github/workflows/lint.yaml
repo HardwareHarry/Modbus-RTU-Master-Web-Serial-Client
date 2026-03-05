@@ -1,26 +1,19 @@
 name: JavaScript Analysis
-
 on: [push, pull_request]
-
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Install dependencies
         run: |
           npm init -y
-          # Added @eslint/js to the install list
-          npm install eslint eslint-plugin-html @eslint/js --save-dev
-          # This ensures Node treats .js files as ESM modules
+          npm install eslint eslint-plugin-html --save-dev
           npm pkg set type="module"
-
       - name: Run Analysis
         run: npx eslint "**/*.html"
