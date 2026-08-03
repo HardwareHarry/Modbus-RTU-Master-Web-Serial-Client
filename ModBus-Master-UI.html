@@ -26,7 +26,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .hdr-btn svg{width:14px;height:14px}
 .hdr-btn.profile-active{border-color:var(--accent-pink);color:var(--accent-pink)}
 .profile-badge{font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;border-radius:6px;background:rgba(236,72,153,0.12);color:var(--accent-pink);border:1px solid rgba(236,72,153,0.25);display:none;align-items:center;gap:6px}
-.profile-badge.visible{display:inline-flex} 
+.profile-badge.visible{display:inline-flex}
 .profile-badge .pb-clear{cursor:pointer;opacity:0.6;transition:opacity 0.15s}
 .profile-badge .pb-clear:hover{opacity:1}
 .main{display:grid;grid-template-columns:340px 1fr;gap:0;min-height:calc(100vh - 71px)}
@@ -108,7 +108,6 @@ td.span-note{color:var(--text-muted);font-style:italic;font-size:11px}
 .error-state .error-icon{font-size:36px;opacity:0.7}
 .error-state .error-title{font-size:14px;font-weight:600;color:var(--accent-red)}
 .error-state .error-detail{font-size:12px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;max-width:500px}
-.dtype-bar-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;flex-wrap:wrap;gap:8px}
 .dtype-bar-actions{display:flex;gap:6px}
 .dtype-bar-actions button{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:'JetBrains Mono',monospace;transition:all 0.15s;background:var(--accent-purple);color:#fff}
 .dtype-bar-actions button:hover{opacity:0.85;transform:translateY(-1px)}
@@ -195,15 +194,14 @@ td.span-note{color:var(--text-muted);font-style:italic;font-size:11px}
 ::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
 @media(max-width:900px){.main{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid var(--border)}}
 </style>
-<meta name="google-site-verification" content="6kgvY3jg2MkkJVq0iVYJQam7Q2ldt0XEEnCgT9pD_6o" />
 </head>
 <body>
 <div class="app">
 
 <!-- About Modal -->
-<div class="modal-overlay" id="aboutModal" onclick="if(event.target===this)closeAbout()"><div class="modal">
+<div class="modal-overlay" id="aboutModal"><div class="modal">
 <h2><span style="width:32px;height:32px;background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff;">MB</span>Modbus RTU Master</h2>
-<div class="version">v1.3.0 — Web Serial Client</div>
+<div class="version">v1.4.0 — Web Serial Client</div>
 <p>A browser-based Modbus RTU master using the Web Serial API. Supports FC01–FC06, FC15, FC16 with device profiles, per-register data type interpretation, minus offset addressing, and raw frame inspection.</p>
 <div class="credits"><b>Fonts:</b> JetBrains Mono &amp; Outfit — SIL Open Font License 1.1<br><b>Technology:</b> Web Serial API (Chrome/Edge 89+)<br><b>No external libraries or frameworks.</b></div>
 <div class="license-box">This is free and unencumbered software released into the public domain.
@@ -213,26 +211,26 @@ Anyone is free to copy, modify, publish, use, compile, sell, or distribute this 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 For more information, please refer to &lt;https://unlicense.org&gt;</div>
-<button class="close-modal" onclick="closeAbout()">Close</button>
+<button class="close-modal" id="btnCloseAbout">Close</button>
 </div></div>
 
 <!-- Profile Modal -->
-<div class="modal-overlay" id="profileModal" onclick="if(event.target===this)closeProfile()"><div class="modal profile-modal">
+<div class="modal-overlay" id="profileModal"><div class="modal profile-modal">
 <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>Device Profile Editor</h2>
 <p>Define labels and data types for coils, inputs, and registers. Save profiles locally or export/import as JSON files to share between sessions.</p>
 <div class="profile-name-row"><div style="flex:2;display:flex;flex-direction:column;gap:4px"><label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em">Profile / Device Name</label><input type="text" id="profileName" placeholder="e.g. Schneider PM5110, ABB ACS580..."></div><div style="flex:0.5;min-width:80px;display:flex;flex-direction:column;gap:4px"><label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em">Slave ID</label><input type="number" id="profileSlaveId" placeholder="1" min="1" max="247" value="1"></div></div>
 <div class="profile-entries" id="profileEntries">
   <div class="profile-entry-header"><span>Type</span><span>Address</span><span>Label</span><span>Data Type</span><span></span></div>
   <div id="profileEntryList"></div>
-  <div class="profile-add-row"><button class="btn btn-secondary" onclick="addProfileEntry()" style="width:auto;">+ Add Entry</button></div>
+  <div class="profile-add-row"><button class="btn btn-secondary" id="btnAddEntry" style="width:auto;">+ Add Entry</button></div>
 </div>
 <div class="profile-actions">
-  <button class="pa-save" onclick="saveCurrentProfile()">Save Profile</button>
-  <button class="pa-export" onclick="exportProfile()">Export JSON</button>
-  <button class="pa-import" onclick="document.getElementById('profileImportFile').click()">Import JSON</button>
-  <input type="file" id="profileImportFile" accept=".json" style="display:none" onchange="importProfile(event)">
-  <button class="pa-clear" onclick="clearActiveProfile()">Clear Active</button>
-  <button class="pa-close" onclick="closeProfile()">Close</button>
+  <button class="pa-save" id="btnProfSave">Save Profile</button>
+  <button class="pa-export" id="btnProfExport">Export JSON</button>
+  <button class="pa-import" id="btnProfImport">Import JSON</button>
+  <input type="file" id="profileImportFile" accept=".json" style="display:none">
+  <button class="pa-clear" id="btnProfClear">Clear Active</button>
+  <button class="pa-close" id="btnProfClose">Close</button>
 </div>
 <div class="saved-profiles"><h4>Saved Profiles</h4><div id="savedProfilesList"></div></div>
 </div></div>
@@ -241,10 +239,10 @@ For more information, please refer to &lt;https://unlicense.org&gt;</div>
 <div class="header">
 <div class="header-left"><div class="logo">MB</div><h1>Modbus RTU Master <span>/ Serial Client</span></h1></div>
 <div class="header-right">
-  <div class="profile-badge" id="profileBadge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg><span id="profileBadgeName"></span><span class="pb-clear" onclick="clearActiveProfile()" title="Clear profile">✕</span></div>
+  <div class="profile-badge" id="profileBadge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg><span id="profileBadgeName"></span><span class="pb-clear" id="btnProfileClear" title="Clear profile">✕</span></div>
   <div class="connection-status"><div class="status-dot" id="statusDot"></div><span id="statusText">Disconnected</span></div>
-  <button class="hdr-btn" id="profileBtn" onclick="openProfile()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>Profiles</button>
-  <button class="hdr-btn" onclick="openAbout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>About</button>
+  <button class="hdr-btn" id="profileBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>Profiles</button>
+  <button class="hdr-btn" id="btnAbout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>About</button>
 </div></div>
 
 <div class="main">
@@ -254,17 +252,17 @@ For more information, please refer to &lt;https://unlicense.org&gt;</div>
 <div class="form-group"><label>Baud Rate</label><select id="baudRate"><option value="1200">1200</option><option value="2400">2400</option><option value="4800">4800</option><option value="9600" selected>9600</option><option value="19200">19200</option><option value="38400">38400</option><option value="57600">57600</option><option value="115200">115200</option></select></div>
 <div class="row-2"><div class="form-group"><label>Data Bits</label><select id="dataBits"><option value="7">7</option><option value="8" selected>8</option></select></div><div class="form-group"><label>Stop Bits</label><select id="stopBits"><option value="1" selected>1</option><option value="2">2</option></select></div></div>
 <div class="row-2"><div class="form-group"><label>Parity</label><select id="parity"><option value="none" selected>None</option><option value="even">Even</option><option value="odd">Odd</option></select></div><div class="form-group"><label>Timeout (ms)</label><input type="number" id="timeout" value="1000" min="100" max="10000" step="100"></div></div>
-<div class="btn-row" style="margin-top:14px"><button class="btn btn-primary" id="btnConnect" onclick="toggleConnection()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Connect</button><button class="btn btn-danger" id="btnDisconnect" onclick="disconnect()" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>Disconnect</button></div></div>
+<div class="btn-row" style="margin-top:14px"><button class="btn btn-primary" id="btnConnect"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Connect</button><button class="btn btn-danger" id="btnDisconnect" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>Disconnect</button></div></div>
 <div class="card"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h4"/></svg>Slave Configuration</div>
-<div class="row-2"><div class="form-group"><label>Slave ID (1-247)</label><input type="number" id="slaveId" value="1" min="1" max="247"></div><div class="form-group"><label>Start Address</label><input type="number" id="startAddr" value="0" min="0" max="65535" oninput="updateWirePreview()"></div></div>
+<div class="row-2"><div class="form-group"><label>Slave ID (1-247)</label><input type="number" id="slaveId" value="1" min="1" max="247"></div><div class="form-group"><label>Start Address</label><input type="number" id="startAddr" value="0" min="0" max="65535"></div></div>
 <div class="form-group"><label>Quantity</label><input type="number" id="quantity" value="10" min="1" max="125"></div>
 <div class="wire-addr-preview" id="wireAddrPreview"></div></div>
 <div class="card"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><circle cx="12" cy="12" r="10"/></svg>Minus Offset</div>
-<div class="toggle-row"><input type="checkbox" id="minusOffsetEnabled" onchange="updateOffsetUI()"><label for="minusOffsetEnabled">Enable Minus Offset</label></div>
-<div class="form-group"><label>Offset Value</label><input type="number" id="minusOffset" value="0" min="0" max="65535" oninput="updateOffsetUI()"></div>
+<div class="toggle-row"><input type="checkbox" id="minusOffsetEnabled"><label for="minusOffsetEnabled">Enable Minus Offset</label></div>
+<div class="form-group"><label>Offset Value</label><input type="number" id="minusOffset" value="0" min="0" max="65535"></div>
 <div class="offset-hint">Subtracts from start address before sending on wire.<br>e.g. Start <b>10001</b>, Offset <b>10001</b> → Wire <b>0</b></div></div>
 <div class="card"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Auto-Polling</div>
-<div class="toggle-row"><input type="checkbox" id="pollingEnabled" onchange="togglePolling()"><label for="pollingEnabled">Enable Auto-Polling</label></div>
+<div class="toggle-row"><input type="checkbox" id="pollingEnabled"><label for="pollingEnabled">Enable Auto-Polling</label></div>
 <div class="form-group"><label>Interval (ms)</label><input type="number" id="pollInterval" value="1000" min="100" max="60000" step="100"></div>
 <div class="offset-hint">Automatically re-sends the current query at the specified interval.</div></div>
 <div class="api-note"><strong>⚡ Web Serial API</strong><br>Requires Chrome/Edge 89+.</div>
@@ -272,415 +270,34 @@ For more information, please refer to &lt;https://unlicense.org&gt;</div>
 
 <!-- Content -->
 <div class="content">
-<div class="fc-tabs">
-<button class="fc-tab active" onclick="setFC(1,this)">FC01 Read Coils</button>
-<button class="fc-tab" onclick="setFC(2,this)">FC02 Read Discrete</button>
-<button class="fc-tab" onclick="setFC(3,this)">FC03 Read Holding</button>
-<button class="fc-tab" onclick="setFC(4,this)">FC04 Read Input</button>
-<button class="fc-tab write" onclick="setFC(5,this)">FC05 Write Coil</button>
-<button class="fc-tab write" onclick="setFC(6,this)">FC06 Write Register</button>
-<button class="fc-tab write" onclick="setFC(15,this)">FC15 Write Coils</button>
-<button class="fc-tab write" onclick="setFC(16,this)">FC16 Write Registers</button>
+<div class="fc-tabs" id="fcTabs">
+<button class="fc-tab active" data-fc="1">FC01 Read Coils</button>
+<button class="fc-tab" data-fc="2">FC02 Read Discrete</button>
+<button class="fc-tab" data-fc="3">FC03 Read Holding</button>
+<button class="fc-tab" data-fc="4">FC04 Read Input</button>
+<button class="fc-tab write" data-fc="5">FC05 Write Coil</button>
+<button class="fc-tab write" data-fc="6">FC06 Write Register</button>
+<button class="fc-tab write" data-fc="15">FC15 Write Coils</button>
+<button class="fc-tab write" data-fc="16">FC16 Write Registers</button>
 </div>
 <div class="query-panel"><div class="panel-header"><h3><span id="fcName">Read Coils</span><span class="fc-badge" id="fcBadge">FC 01</span></h3></div>
 <div id="profileFcInfo" style="display:none;font-size:12px;color:var(--text-muted);background:rgba(236,72,153,0.06);border:1px solid rgba(236,72,153,0.15);border-radius:8px;padding:10px 14px;margin-bottom:14px;line-height:1.5"></div>
-<div class="write-value-group" id="writeGroup" style="display:none"><h4 id="writeGroupTitle">Write Value(s)</h4><div id="writePickerWrap" style="display:none;margin-bottom:12px"><div id="writePickerHint" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:6px">Click to select, enter values, then Send Query:</div><div id="writePicker" style="display:flex;flex-direction:column;gap:4px;max-height:180px;overflow-y:auto"></div></div><div id="writeManualWrap"><div class="form-group"><label id="writeLabel">Value</label><input type="text" id="writeValue" placeholder="Enter value(s)..."></div><div style="font-size:11px;color:var(--text-muted);margin-top:6px" id="writeHint"></div></div></div>
-<div class="send-btn-row"><button class="btn btn-primary" id="sendBtn" onclick="sendQuery()" style="max-width:200px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg><span id="sendBtnText">Send Query</span></button></div></div>
+<div class="write-value-group" id="writeGroup" style="display:none"><h4 id="writeGroupTitle">Write Value(s)</h4><div id="writePickerWrap" style="display:none;margin-bottom:12px"><div id="writePickerHint" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:6px">Click to select, enter values, then Send Update:</div><div id="writePicker" style="display:flex;flex-direction:column;gap:4px;max-height:180px;overflow-y:auto"></div></div><div id="writeManualWrap"><div class="form-group"><label id="writeLabel">Value</label><input type="text" id="writeValue" placeholder="Enter value(s)..."></div><div style="font-size:11px;color:var(--text-muted);margin-top:6px" id="writeHint"></div></div></div>
+<div class="send-btn-row"><button class="btn btn-primary" id="sendBtn" style="max-width:200px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg><span id="sendBtnText">Send Query</span></button></div></div>
 
-<div class="collapsible" id="sectionResponse"><div class="collapsible-header" onclick="toggleSection('sectionResponse')"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h4"/></svg>Response Data</h3><div class="collapsible-header-right"><div class="response-meta" id="responseMeta" style="display:none"><span>⏱<span id="respTime">--</span>ms</span> <span>📦<span id="respBytes">--</span>b</span> <span>Slave <span id="respSlave">--</span></span><span class="offset-indicator" id="offsetIndicator">Offset:<span id="offsetDisplay">0</span></span></div><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+<div class="collapsible" id="sectionResponse"><div class="collapsible-header" data-section="sectionResponse"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h4"/></svg>Response Data</h3><div class="collapsible-header-right"><div class="response-meta" id="responseMeta" style="display:none"><span>⏱<span id="respTime">--</span>ms</span> <span>📦<span id="respBytes">--</span>b</span> <span>Slave <span id="respSlave">--</span></span><span class="offset-indicator" id="offsetIndicator">Offset:<span id="offsetDisplay">0</span></span></div><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div></div>
 <div class="collapsible-body"><div id="emptyState" class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h4"/></svg><p>No data yet</p><small>Connect and send a query to see results.</small></div><div id="errorState" class="error-state" style="display:none"><div class="error-icon">⚠️</div><div class="error-title" id="errorTitle">Error</div><div class="error-detail" id="errorDetail"></div></div><div class="response-table-inner"><table id="responseTable" style="display:none"><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table></div></div></div>
 
-<div class="collapsible collapsed" id="sectionDtype" style="display:none"><div class="collapsible-header" onclick="toggleSection('sectionDtype')"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Data Type per Register</h3><div class="collapsible-header-right"><div class="dtype-bar-actions"><button class="secondary-action" onclick="event.stopPropagation();copyFirstToAll()">Copy #1→All</button><button onclick="event.stopPropagation();reRender()">Apply</button></div><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div></div>
-<div class="collapsible-body"><div class="dtype-grid" id="dtypeGrid" style="padding:12px 16px"></div><div class="byte-order-row"><label>Byte Order:</label><select id="byteOrder" onchange="reRender()"><option value="AB" selected>Big-Endian (AB CD)</option><option value="BA">Little-Endian (BA DC)</option><option value="CDAB">Mid-Big (CD AB)</option><option value="DCBA">Mid-Little (DC BA)</option></select></div></div></div>
+<div class="collapsible collapsed" id="sectionDtype" style="display:none"><div class="collapsible-header" data-section="sectionDtype"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Data Type per Register</h3><div class="collapsible-header-right"><div class="dtype-bar-actions"><button class="secondary-action" id="btnCopyFirst">Copy #1→All</button><button id="btnApply">Apply</button></div><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+<div class="collapsible-body"><div class="dtype-grid" id="dtypeGrid" style="padding:12px 16px"></div><div class="byte-order-row"><label>Byte Order:</label><select id="byteOrder"><option value="AB" selected>Big-Endian (AB CD)</option><option value="BA">Little-Endian (BA DC)</option><option value="CDAB">Mid-Big (CD AB)</option><option value="DCBA">Mid-Little (DC BA)</option></select></div></div></div>
 
-<div class="collapsible collapsed" id="sectionRaw" style="display:none"><div class="collapsible-header" onclick="toggleSection('sectionRaw')"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Raw Response Frame</h3><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+<div class="collapsible collapsed" id="sectionRaw" style="display:none"><div class="collapsible-header" data-section="sectionRaw"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Raw Response Frame</h3><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
 <div class="collapsible-body"><div class="raw-frame-body"><div class="raw-row"><span class="raw-tag">HEX</span><span class="raw-hex-data" id="rawHex"></span></div><div class="raw-row"><span class="raw-tag">BIN</span><span class="raw-bin-data" id="rawBin"></span></div><div class="raw-row"><span class="raw-tag">ASCII</span><span class="raw-ascii-data" id="rawAscii"></span></div></div></div></div>
 
-<div class="collapsible" id="sectionLog"><div class="collapsible-header" onclick="toggleSection('sectionLog')"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Communication Log <span class="log-count" id="logCount">0</span></h3><div class="collapsible-header-right"><button class="btn btn-secondary" style="width:auto;padding:4px 10px;font-size:11px" onclick="event.stopPropagation();clearLog();">Clear</button><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+<div class="collapsible" id="sectionLog"><div class="collapsible-header" data-section="sectionLog"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Communication Log <span class="log-count" id="logCount">0</span></h3><div class="collapsible-header-right"><button class="btn btn-secondary" id="btnClearLog" style="width:auto;padding:4px 10px;font-size:11px">Clear</button><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div></div>
 <div class="collapsible-body"><div class="log-body" id="logBody"></div></div></div>
 </div></div></div>
 
-<script>
-// ─── State ───────────────────────────────────────────
-let port=null,writer=null,connected=false,currentFC=1,pollingTimer=null,isPolling=false;
-let logEntries=0,lastResponse=null,registerTypes={},activeProfile=null;
-
-const DATA_TYPES={int8:{label:'8-bit INT',regSpan:1},int16:{label:'16-bit INT',regSpan:1},int32:{label:'32-bit INT',regSpan:2},uint8:{label:'8-bit UINT',regSpan:1},uint16:{label:'16-bit UINT',regSpan:1},uint32:{label:'32-bit UINT',regSpan:2},uint64:{label:'64-bit UINT',regSpan:4},float32:{label:'32-bit Float',regSpan:2},float64:{label:'64-bit Float',regSpan:4},string4:{label:'String4',regSpan:2},string6:{label:'String6',regSpan:3},string8:{label:'String8',regSpan:4},string12:{label:'String12',regSpan:6},string16:{label:'String16',regSpan:8}};
-const FC_TO_ENTRY={1:'coil',2:'discrete',3:'holding',4:'input',5:'coil',6:'holding',15:'coil',16:'holding'};
-const fcNames={1:'Read Coils',2:'Read Discrete Inputs',3:'Read Holding Registers',4:'Read Input Registers',5:'Write Single Coil',6:'Write Single Register',15:'Write Multiple Coils',16:'Write Multiple Registers'};
-const writeFCs=[5,6,15,16];
-
-// ─── Byte Reorder & Decode ───────────────────────────
-function getByteOrder(){return document.getElementById('byteOrder').value}
-function reorderBytes(regs,bo){const b=[];for(const r of regs)b.push((r>>8)&0xFF,r&0xFF);if(bo==='AB')return b;if(bo==='BA'){const o=[];for(let i=0;i<b.length;i+=2)o.push(b[i+1],b[i]);return o}if(bo==='CDAB'){const o=[...b];for(let i=0;i+3<o.length;i+=4){const t0=o[i],t1=o[i+1];o[i]=o[i+2];o[i+1]=o[i+3];o[i+2]=t0;o[i+3]=t1}return o}if(bo==='DCBA'){const o=[...b];for(let i=0;i+3<o.length;i+=4){const t0=o[i],t1=o[i+1],t2=o[i+2],t3=o[i+3];o[i]=t3;o[i+1]=t2;o[i+2]=t1;o[i+3]=t0}return o}return b}
-function decodeValue(type,regs,bo){const def=DATA_TYPES[type];if(!def||regs.length<def.regSpan)return'N/A';const bytes=reorderBytes(regs.slice(0,def.regSpan),bo);const buf=new ArrayBuffer(Math.max(bytes.length,8));const v=new DataView(buf);for(let i=0;i<bytes.length;i++)v.setUint8(i,bytes[i]);switch(type){case'int8':return v.getInt8(0)+'';case'int16':return v.getInt16(0)+'';case'int32':return v.getInt32(0)+'';case'uint8':return v.getUint8(0)+'';case'uint16':return v.getUint16(0)+'';case'uint32':return v.getUint32(0)+'';case'uint64':return((BigInt(v.getUint32(0))<<32n)|BigInt(v.getUint32(4)))+'';case'float32':{const f=v.getFloat32(0);return(isNaN(f)||!isFinite(f))?'NaN/Inf':f.toPrecision(7)}case'float64':{const f=v.getFloat64(0);return(isNaN(f)||!isFinite(f))?'NaN/Inf':f.toPrecision(10)}default:if(type.startsWith('string')){let s='';for(const b of bytes)s+=(b>=32&&b<=126)?String.fromCharCode(b):(b===0?'':'\u00B7');return'"'+s+'"'}return'?'}}
-
-// ─── CRC16 ───────────────────────────────────────────
-function crc16(buf){let c=0xFFFF;for(let i=0;i<buf.length;i++){c^=buf[i];for(let j=0;j<8;j++)c=(c&1)?(c>>1)^0xA001:c>>1}return c}
-function appendCRC(f){const c=crc16(f),o=new Uint8Array(f.length+2);o.set(f);o[f.length]=c&0xFF;o[f.length+1]=(c>>8)&0xFF;return o}
-function verifyCRC(d){if(d.length<4)return false;return crc16(d.slice(0,d.length-2))===(d[d.length-2]|(d[d.length-1]<<8))}
-
-// ─── Offset ──────────────────────────────────────────
-function getWireAddress(a){if(!document.getElementById('minusOffsetEnabled').checked)return a;return Math.max(0,Math.min(65535,a-(parseInt(document.getElementById('minusOffset').value)||0)))}
-function updateOffsetUI(){const en=document.getElementById('minusOffsetEnabled').checked,o=parseInt(document.getElementById('minusOffset').value)||0,ind=document.getElementById('offsetIndicator');if(en&&o){ind.classList.add('visible');document.getElementById('offsetDisplay').textContent='\u2212'+o}else ind.classList.remove('visible');updateWirePreview()}
-function updateWirePreview(){const en=document.getElementById('minusOffsetEnabled').checked,p=document.getElementById('wireAddrPreview');if(!en){p.classList.remove('visible');return}const a=parseInt(document.getElementById('startAddr').value)||0,w=getWireAddress(a);p.classList.add('visible');p.innerHTML='Display: <b>'+a+'</b> \u2192 Wire: <b>'+w+'</b> (0x'+w.toString(16).toUpperCase().padStart(4,'0')+')'}
-
-// ─── Frame Builders ──────────────────────────────────
-function mkFrame(s,fc,w,q){const f=new Uint8Array(6);f[0]=s;f[1]=fc;f[2]=(w>>8)&0xFF;f[3]=w&0xFF;f[4]=(q>>8)&0xFF;f[5]=q&0xFF;return appendCRC(f)}
-function mkWCoil(s,w,v){const f=new Uint8Array(6);f[0]=s;f[1]=5;f[2]=(w>>8)&0xFF;f[3]=w&0xFF;f[4]=v?0xFF:0;f[5]=0;return appendCRC(f)}
-function mkWReg(s,w,v){const f=new Uint8Array(6);f[0]=s;f[1]=6;f[2]=(w>>8)&0xFF;f[3]=w&0xFF;f[4]=(v>>8)&0xFF;f[5]=v&0xFF;return appendCRC(f)}
-function mkWCoils(s,w,vs){const q=vs.length,bc=Math.ceil(q/8),f=new Uint8Array(7+bc);f[0]=s;f[1]=15;f[2]=(w>>8)&0xFF;f[3]=w&0xFF;f[4]=(q>>8)&0xFF;f[5]=q&0xFF;f[6]=bc;for(let i=0;i<q;i++)if(vs[i])f[7+(i>>3)]|=1<<(i&7);return appendCRC(f)}
-function mkWRegs(s,w,vs){const q=vs.length,f=new Uint8Array(7+q*2);f[0]=s;f[1]=16;f[2]=(w>>8)&0xFF;f[3]=w&0xFF;f[4]=(q>>8)&0xFF;f[5]=q&0xFF;f[6]=q*2;for(let i=0;i<q;i++){f[7+i*2]=(vs[i]>>8)&0xFF;f[8+i*2]=vs[i]&0xFF}return appendCRC(f)}
-
-// ─── Serial ──────────────────────────────────────────
-async function toggleConnection(){if(connected)return;try{if(!('serial' in navigator)){addLog('err','Web Serial not supported.');return}port=await navigator.serial.requestPort();const br=+$('baudRate').value,db=+$('dataBits').value,sb=+$('stopBits').value,p=$('parity').value;await port.open({baudRate:br,dataBits:db,stopBits:sb,parity:p});writer=port.writable.getWriter();connected=true;updateConnUI(true);addLog('tx','Connected @ '+br+' '+db+p[0].toUpperCase()+sb)}catch(e){addLog('err','Connect fail: '+e.message)}}
-async function disconnect(){try{if(isPolling)stopPolling();if(writer){writer.releaseLock();writer=null}if(port){await port.close();port=null}connected=false;updateConnUI(false);addLog('err','Disconnected')}catch(e){addLog('err','Disconnect err: '+e.message);connected=false;updateConnUI(false)}}
-function $(id){return document.getElementById(id)}
-function updateConnUI(c){$('statusDot').classList.toggle('connected',c);$('statusText').textContent=c?'Connected':'Disconnected';$('btnConnect').style.display=c?'none':'flex';$('btnDisconnect').style.display=c?'flex':'none'}
-async function readResp(expMin){const to=+$('timeout').value||1000,buf=[],rd=port.readable.getReader();let done=false;const tm=setTimeout(()=>done=true,to);try{while(!done){const{value,done:sd}=await Promise.race([rd.read(),new Promise(r=>setTimeout(()=>r({value:null,done:true}),to))]);if(sd||!value)break;buf.push(...value);if(buf.length>=expMin){await new Promise(r=>setTimeout(r,50));const{value:ex}=await Promise.race([rd.read(),new Promise(r=>setTimeout(()=>r({value:null,done:true}),80))]);if(ex)buf.push(...ex);break}}}finally{clearTimeout(tm);rd.releaseLock()}return new Uint8Array(buf)}
-
-// ─── Sections ────────────────────────────────────────
-function toggleSection(id){$(id).classList.toggle('collapsed')}
-
-// ─── Profile System ──────────────────────────────────
-function getProfileLabel(fc,addr){if(!activeProfile)return null;const et=FC_TO_ENTRY[fc];const e=activeProfile.entries.find(x=>x.type===et&&x.address===addr);return e?e.label:null}
-function getProfileDataType(fc,addr){if(!activeProfile)return null;const et=FC_TO_ENTRY[fc];const e=activeProfile.entries.find(x=>x.type===et&&x.address===addr);return(e&&e.dataType&&e.dataType!=='default')?e.dataType:null}
-function applyProfileTypes(rc,dsa,fc){for(let i=0;i<rc;i++){const pt=getProfileDataType(fc,dsa+i);if(pt)registerTypes[i]=pt;else if(!registerTypes[i])registerTypes[i]='uint16'}}
-
-function addProfileEntry(type,address,label,dataType){
-  const list=$('profileEntryList'),div=document.createElement('div');
-  div.className='profile-entry';
-  const tOpts=['coil','discrete','holding','input'].map(t=>'<option value="'+t+'"'+(t===(type||'holding')?' selected':'')+'>'+t[0].toUpperCase()+t.slice(1)+'</option>').join('');
-  const dOpts='<option value="default">Default</option>'+Object.entries(DATA_TYPES).map(([k,v])=>'<option value="'+k+'"'+(k===dataType?' selected':'')+'>'+v.label+'</option>').join('');
-  div.innerHTML='<select>'+tOpts+'</select><input type="number" value="'+(address||0)+'" min="0" max="65535"><input type="text" value="'+esc(label||'')+'" placeholder="Label..." style="font-family:Outfit,sans-serif"><select>'+dOpts+'</select><button class="pe-del" onclick="this.parentElement.remove()">\u2715</button>';
-  list.appendChild(div)
-}
-function collectEntries(){const entries=[];document.querySelectorAll('#profileEntryList .profile-entry').forEach(r=>{const s=r.querySelectorAll('select'),inp=r.querySelectorAll('input');entries.push({type:s[0].value,address:+inp[0].value||0,label:inp[1].value.trim(),dataType:s[1].value})});return entries}
-function loadIntoEditor(p){$('profileName').value=p.name||'';$('profileSlaveId').value=p.slaveId||1;$('profileEntryList').innerHTML='';(p.entries||[]).forEach(e=>addProfileEntry(e.type,e.address,e.label,e.dataType))}
-function activateProfile(p){activeProfile=JSON.parse(JSON.stringify(p));$('profileBadge').classList.add('visible');$('profileBadgeName').textContent=p.name||'Unnamed';$('profileBtn').classList.add('profile-active');if(p.slaveId)$('slaveId').value=p.slaveId;resetResponseArea();applyProfileToFC(currentFC)}
-function clearActiveProfile(){activeProfile=null;$('profileBadge').classList.remove('visible');$('profileBtn').classList.remove('profile-active');resetResponseArea();$('profileFcInfo').style.display='none'}
-function saveCurrentProfile(){const name=$('profileName').value.trim();if(!name){alert('Enter a profile name.');return}const p={name,slaveId:+$('profileSlaveId').value||1,entries:collectEntries(),savedAt:new Date().toISOString()};const saved=JSON.parse(localStorage.getItem('modbusProfiles')||'[]');const idx=saved.findIndex(x=>x.name===name);if(idx>=0)saved[idx]=p;else saved.push(p);localStorage.setItem('modbusProfiles',JSON.stringify(saved));activateProfile(p);renderSaved();addLog('tx','Profile "'+name+'" saved ('+p.entries.length+' entries, Slave '+p.slaveId+')')}
-function exportProfile(){const name=$('profileName').value.trim()||'modbus-profile';const p={name,slaveId:+$('profileSlaveId').value||1,entries:collectEntries()};const b=new Blob([JSON.stringify(p,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name.replace(/[^a-zA-Z0-9_-]/g,'_')+'.json';a.click();URL.revokeObjectURL(u)}
-function importProfile(ev){const file=ev.target.files[0];if(!file)return;const r=new FileReader();r.onload=function(e){try{const p=JSON.parse(e.target.result);if(!Array.isArray(p.entries))throw new Error('Invalid format');loadIntoEditor(p);activateProfile(p);addLog('tx','Imported "'+p.name+'" ('+p.entries.length+' entries)')}catch(err){alert('Import failed: '+err.message)}};r.readAsText(file);ev.target.value=''}
-function renderSaved(){const saved=JSON.parse(localStorage.getItem('modbusProfiles')||'[]'),list=$('savedProfilesList');if(!saved.length){list.innerHTML='<div class="no-profiles">No saved profiles yet.</div>';return}list.innerHTML=saved.map((p,i)=>'<div class="saved-profile-item"><div><div class="sp-name">'+esc(p.name)+'</div><div class="sp-info">'+p.entries.length+' entries \u00B7 Slave '+(p.slaveId||1)+(p.savedAt?' \u00B7 '+new Date(p.savedAt).toLocaleDateString():'')+'</div></div><div class="sp-actions"><button class="sp-load" onclick="loadSaved('+i+')">Load</button><button class="sp-del" onclick="delSaved('+i+')">\u2715</button></div></div>').join('')}
-function loadSaved(i){const s=JSON.parse(localStorage.getItem('modbusProfiles')||'[]');if(s[i]){loadIntoEditor(s[i]);activateProfile(s[i])}}
-function delSaved(i){const s=JSON.parse(localStorage.getItem('modbusProfiles')||'[]');if(s[i]&&confirm('Delete "'+s[i].name+'"?')){if(activeProfile&&activeProfile.name===s[i].name)clearActiveProfile();s.splice(i,1);localStorage.setItem('modbusProfiles',JSON.stringify(s));renderSaved()}}
-function openProfile(){$('profileModal').classList.add('visible');renderSaved()}
-function closeProfile(){$('profileModal').classList.remove('visible')}
-function openAbout(){$('aboutModal').classList.add('visible')}
-function closeAbout(){$('aboutModal').classList.remove('visible')}
-
-// ─── Dtype Grid ──────────────────────────────────────
-function buildDtypeGrid(rc,dsa){const grid=$('dtypeGrid');$('sectionDtype').style.display='block';grid.innerHTML='';const opts=Object.entries(DATA_TYPES).map(([k,v])=>'<option value="'+k+'">'+v.label+'</option>').join('');for(let i=0;i<rc;i++){if(!registerTypes[i])registerTypes[i]='uint16';const d=document.createElement('div');d.className='dtype-item';d.innerHTML='<span class="dtype-addr">'+(dsa+i)+'</span><select data-reg="'+i+'" onchange="registerTypes['+i+']=this.value;reRender()">'+opts+'</select>';d.querySelector('select').value=registerTypes[i];grid.appendChild(d)}}
-function copyFirstToAll(){const f=registerTypes[0]||'uint16',rc=lastResponse&&lastResponse.regValues?lastResponse.regValues.length:0;for(let i=0;i<rc;i++)registerTypes[i]=f;document.querySelectorAll('#dtypeGrid select').forEach(s=>s.value=f);reRender()}
-function reRender(){if(lastResponse&&(lastResponse.fc===3||lastResponse.fc===4))displayResponse(lastResponse.fc,lastResponse.data,lastResponse.displayStartAddr,lastResponse.quantity,lastResponse.elapsed)}
-
-// ─── Error Display ───────────────────────────────────
-function showError(t,d){$('emptyState').style.display='none';$('responseTable').style.display='none';$('errorState').style.display='flex';$('errorTitle').textContent=t;$('errorDetail').textContent=d||'';$('sectionDtype').style.display='none';$('sectionRaw').style.display='none'}
-function clearError(){$('errorState').style.display='none'}
-function resetResponseArea(){
-  $('responseTable').style.display='none';$('tableHead').innerHTML='';$('tableBody').innerHTML='';
-  $('errorState').style.display='none';$('emptyState').style.display='flex';
-  $('responseMeta').style.display='none';
-  $('sectionDtype').style.display='none';$('sectionRaw').style.display='none';
-  lastResponse=null;registerTypes={};
-}
-
-// ─── Send Query ──────────────────────────────────────
-async function sendQuery(){
-  if(!connected){addLog('err','Not connected.');return}
-  const sid=+$('slaveId').value,dsa=+$('startAddr').value,wa=getWireAddress(dsa),qty=+$('quantity').value,fc=currentFC;
-  // Non-contiguous multi-write: send individual FC06/FC05 commands for each selected item
-  if(pendingMultiWrites&&(fc===16||fc===15)){
-    var isCoil=(fc===15);
-    addLog('tx','[Multi-write] Sending '+pendingMultiWrites.length+' individual '+(isCoil?'coil':'register')+' writes...');
-    var allOk=true;
-    for(var wi=0;wi<pendingMultiWrites.length;wi++){
-      var item=pendingMultiWrites[wi];
-      var itemWa=getWireAddress(item.address);
-      var frame,expMin=8;
-      if(isCoil){
-        var cv=item.val==='1'||item.val.toLowerCase()==='true'||item.val==='on';
-        frame=mkWCoil(sid,itemWa,cv);
-      }else{
-        var rv=parseInt(item.val);
-        if(isNaN(rv)||rv<0||rv>65535){addLog('err','Invalid value for '+item.address+' ('+(item.label||'')+')');allOk=false;continue}
-        frame=mkWReg(sid,itemWa,rv);
-      }
-      var lbl=item.label?' ('+item.label+')':'';
-      addLog('tx','  Write '+item.address+lbl+' = '+item.val+' \u2192 '+hex(frame));
-      try{
-        var t0=performance.now();await writer.write(frame);var resp=await readResp(expMin);var el=(performance.now()-t0).toFixed(1);
-        if(!resp.length){addLog('err','  Timeout on '+item.address+lbl);allOk=false;continue}
-        addLog('rx','  '+hex(resp)+' ('+el+'ms)');
-        if(!verifyCRC(resp)){addLog('err','  CRC failed on '+item.address+lbl);allOk=false;continue}
-        if(resp[1]&0x80){var ec=resp[2],en={1:'Illegal Function',2:'Illegal Data Address',3:'Illegal Data Value',4:'Slave Device Failure'};addLog('err','  Exception on '+item.address+lbl+': '+(en[ec]||'Unknown'));allOk=false;continue}
-      }catch(e){addLog('err','  Error on '+item.address+lbl+': '+e.message);allOk=false}
-    }
-    if(allOk){clearError();addLog('tx','[Multi-write] All '+pendingMultiWrites.length+' writes completed successfully.')}
-    else showError('Partial Write','Some writes failed. Check the communication log for details.');
-    return;
-  }
-  var frame,expMin;
-  try{
-    if(fc<=2){frame=mkFrame(sid,fc,wa,qty);expMin=5+Math.ceil(qty/8)}
-    else if(fc<=4){frame=mkFrame(sid,fc,wa,qty);expMin=5+qty*2}
-    else if(fc===5){const v=$('writeValue').value.trim();frame=mkWCoil(sid,wa,v==='1'||v.toLowerCase()==='true'||v==='on');expMin=8}
-    else if(fc===6){const v=+$('writeValue').value.trim();if(isNaN(v)||v<0||v>65535){showError('Invalid Value','0\u201365535');return}frame=mkWReg(sid,wa,v);expMin=8}
-    else if(fc===15){const vs=$('writeValue').value.trim().split(/[\s,]+/).map(x=>x==='1'||x.toLowerCase()==='true');frame=mkWCoils(sid,wa,vs);expMin=8}
-    else if(fc===16){const vs=$('writeValue').value.trim().split(/[\s,]+/).map(Number);if(vs.some(isNaN)){showError('Invalid','All must be integers');return}frame=mkWRegs(sid,wa,vs);expMin=8}
-    const oe=$('minusOffsetEnabled').checked,ai=oe&&wa!==dsa?'Addr='+dsa+'\u2192Wire='+wa:'Addr='+wa;
-    addLog('tx','['+fcNames[fc]+'] Slave='+sid+' '+ai+' Qty='+qty+' \u2192 '+hex(frame));
-    const t0=performance.now();await writer.write(frame);const resp=await readResp(expMin);const el=(performance.now()-t0).toFixed(1);
-    if(!resp.length){addLog('err','Timeout');showError('Timeout','No response from slave.');return}
-    addLog('rx',hex(resp)+' ('+el+'ms, '+resp.length+'b)');
-    if(!verifyCRC(resp)){addLog('err','CRC failed');showError('CRC Error','Check wiring/baud rate.');return}
-    if(resp[1]&0x80){const ec=resp[2],en={1:'Illegal Function',2:'Illegal Data Address',3:'Illegal Data Value',4:'Slave Device Failure'};addLog('err','Exception: '+(en[ec]||'Unknown')+' ('+ec+')');showError('Exception: '+(en[ec]||'Unknown'),'Code '+ec+', FC='+fc+', Addr='+wa);return}
-    clearError();showRawFrame(resp);displayResponse(fc,resp,dsa,qty,el)
-  }catch(e){addLog('err',e.message);showError('Error',e.message)}
-}
-function showRawFrame(d){$('sectionRaw').style.display='block';$('rawHex').textContent=hex(d);$('rawBin').textContent=Array.from(d).map(b=>b.toString(2).padStart(8,'0')).join(' ');$('rawAscii').textContent=Array.from(d).map(b=>(b>=32&&b<=126)?String.fromCharCode(b):'\u00B7').join('')}
-
-// ─── Display Response ────────────────────────────────
-function displayResponse(fc,data,dsa,qty,elapsed){
-  const tbl=$('responseTable'),head=$('tableHead'),body=$('tableBody');
-  $('responseMeta').style.display='flex';$('respTime').textContent=elapsed;$('respBytes').textContent=data.length;$('respSlave').textContent=data[0];
-  $('emptyState').style.display='none';tbl.style.display='table';body.innerHTML='';
-  const hp=!!activeProfile;
-
-  if(fc===1||fc===2){
-    $('sectionDtype').style.display='none';
-    let hdr='<th>Address</th>';if(hp)hdr+='<th>Label</th>';hdr+='<th>Value</th><th>State</th><th>Hex</th><th>Binary</th>';
-    head.innerHTML='<tr>'+hdr+'</tr>';
-    for(let i=0;i<qty;i++){
-      const v=(data[3+(i>>3)]>>(i&7))&1,addr=dsa+i,lbl=getProfileLabel(fc,addr);
-      const tr=document.createElement('tr');tr.className='fade-in';tr.style.animationDelay=i*15+'ms';
-      let cells='<td class="addr">'+addr+'</td>';
-      if(hp)cells+='<td class="lbl">'+esc(lbl||'\u2014')+'</td>';
-      cells+='<td class="'+(v?'bool-true':'bool-false')+'">'+v+'</td><td class="'+(v?'bool-true':'bool-false')+'">'+(v?'ON':'OFF')+'</td><td class="hex">0x'+v.toString(16).toUpperCase().padStart(2,'0')+'</td><td style="color:var(--text-muted)">'+v.toString(2)+'</td>';
-      tr.innerHTML=cells;body.appendChild(tr)
-    }
-    lastResponse={fc,data,displayStartAddr:dsa,quantity:qty,elapsed}
-
-  }else if(fc===3||fc===4){
-    const bc=data[2],rc=bc/2,rv=[];
-    for(let i=0;i<rc;i++)rv.push((data[3+i*2]<<8)|data[4+i*2]);
-    lastResponse={fc,data,displayStartAddr:dsa,quantity:qty,elapsed,regValues:rv};
-    applyProfileTypes(rc,dsa,fc);buildDtypeGrid(rc,dsa);
-    let hdr='<th>Address</th>';if(hp)hdr+='<th>Label</th>';hdr+='<th>Raw(U16)</th><th>Hex</th><th>Type</th><th>Interpreted</th>';
-    head.innerHTML='<tr>'+hdr+'</tr>';
-    const bo=getByteOrder();let i=0;
-    while(i<rc){
-      const type=registerTypes[i]||'uint16',def=DATA_TYPES[type],span=def?def.regSpan:1;
-      const decoded=decodeValue(type,rv.slice(i,i+span),bo),raw=rv[i],addr=dsa+i,lbl=getProfileLabel(fc,addr);
-      const tr=document.createElement('tr');tr.className='fade-in';tr.style.animationDelay=i*15+'ms';
-      let cells='<td class="addr">'+addr+'</td>';
-      if(hp)cells+='<td class="lbl">'+esc(lbl||'\u2014')+'</td>';
-      cells+='<td class="val">'+raw+'</td><td class="hex">0x'+raw.toString(16).toUpperCase().padStart(4,'0')+'</td><td>'+(def?def.label:type)+'</td><td class="interpreted">'+esc(decoded)+'</td>';
-      tr.innerHTML=cells;body.appendChild(tr);
-      for(let j=1;j<span&&(i+j)<rc;j++){
-        const tr2=document.createElement('tr');tr2.className='fade-in';const ru=rv[i+j],lbl2=getProfileLabel(fc,dsa+i+j);
-        let c2='<td class="addr">'+(dsa+i+j)+'</td>';
-        if(hp)c2+='<td class="lbl">'+esc(lbl2||'\u2014')+'</td>';
-        c2+='<td class="val">'+ru+'</td><td class="hex">0x'+ru.toString(16).toUpperCase().padStart(4,'0')+'</td><td class="span-note">\u2191 '+def.label+'</td><td class="span-note">\u2014</td>';
-        tr2.innerHTML=c2;body.appendChild(tr2)
-      }
-      i+=span
-    }
-
-  }else{
-    $('sectionDtype').style.display='none';
-    head.innerHTML='<tr><th>Field</th><th>Value</th><th>Hex</th></tr>';
-    const ra=(data[2]<<8|data[3]),vr=(data[4]<<8|data[5]);
-    const rows=[['Slave ID',data[0],'0x'+data[0].toString(16).toUpperCase().padStart(2,'0')],['Function Code',data[1],'0x'+data[1].toString(16).toUpperCase().padStart(2,'0')],['Address (wire)',ra,'0x'+ra.toString(16).toUpperCase().padStart(4,'0')],['Address (display)',dsa,'\u2014'],[fc===5||fc===15?'Coil Value':'Reg Value',vr,'0x'+vr.toString(16).toUpperCase().padStart(4,'0')],['Status','Success \u2713','\u2014']];
-    rows.forEach(([f,v,h],i)=>{const tr=document.createElement('tr');tr.className='fade-in';tr.style.animationDelay=i*30+'ms';tr.innerHTML='<td>'+f+'</td><td class="val">'+v+'</td><td class="hex">'+h+'</td>';body.appendChild(tr)});
-    lastResponse={fc,data,displayStartAddr:dsa,quantity:qty,elapsed}
-  }
-}
-
-// ─── Profile Auto-Config on FC Change ────────────────
-const FC_BASE_ADDR={1:1,2:10001,3:40001,4:30001,5:1,6:40001,15:1,16:40001};
-let writePickerEntries=[];
-
-function applyProfileToFC(fc){
-  var mw=$('writeManualWrap'),pw=$('writePickerWrap'),info=$('profileFcInfo');
-  var entryTypeLabels={coil:'coils',discrete:'discrete inputs',holding:'holding registers',input:'input registers'};
-  // No profile: show manual, hide picker, hide info
-  if(!activeProfile){pw.style.display='none';mw.style.display='block';info.style.display='none';$('writeGroupTitle').textContent='Write Value(s)';return}
-  var et=FC_TO_ENTRY[fc];
-  if(!et){pw.style.display='none';mw.style.display='block';info.style.display='none';$('writeGroupTitle').textContent='Write Value(s)';return}
-  var entries=activeProfile.entries.filter(function(e){return e.type===et});
-  if(!entries.length){
-    // Profile active but no entries for this type - show message
-    pw.style.display='none';mw.style.display='block';$('writeGroupTitle').textContent='Write Value(s)';
-    var typeName=entryTypeLabels[et]||et;
-    info.style.display='block';
-    info.innerHTML='<strong style="color:var(--accent-pink)">' +esc(activeProfile.name)+'</strong> has no '+typeName+' defined. You can still query manually using the address fields, or <a href="#" onclick="event.preventDefault();openProfile()" style="color:var(--accent-pink);text-decoration:underline">edit the profile</a> to add entries.';
-    return;
-  }
-  // Entries found - hide info message
-  info.style.display='none';
-  // Calculate address range from profile entries
-  var addrs=entries.map(function(e){return e.address}).sort(function(a,b){return a-b});
-  var baseAddr=FC_BASE_ADDR[fc]||0;
-  var startAddr=addrs[0];
-  var maxEnd=0;
-  for(var i=0;i<entries.length;i++){
-    var dt=entries[i].dataType&&entries[i].dataType!=='default'?entries[i].dataType:'uint16';
-    var span=DATA_TYPES[dt]?DATA_TYPES[dt].regSpan:1;
-    if(entries[i].address+span>maxEnd)maxEnd=entries[i].address+span;
-  }
-  var qty=Math.max(1,maxEnd-startAddr);
-  $('startAddr').value=startAddr;
-  $('quantity').value=Math.min(qty,fc<=2?2000:125);
-  $('minusOffsetEnabled').checked=true;
-  $('minusOffset').value=baseAddr;
-  updateOffsetUI();
-  // For write FCs: show picker ONLY, hide manual input
-  if(writeFCs.includes(fc)){
-    buildWritePicker(fc,entries);
-    mw.style.display='none';
-    $('writeGroupTitle').textContent='Write \u2014 '+activeProfile.name;
-  }else{
-    pw.style.display='none';
-    mw.style.display='block';
-  }
-}
-
-function buildWritePicker(fc,entries){
-  var wrap=$('writePickerWrap'),picker=$('writePicker');
-  picker.innerHTML='';writePickerEntries=[];
-  if(!entries.length){wrap.style.display='none';return}
-  wrap.style.display='block';
-  var isSingle=(fc===5||fc===6),isCoil=(fc===5||fc===15);
-  var hint=$('writePickerHint');
-  if(isSingle)hint.textContent=isCoil?'Click a coil to select it, set ON/OFF, then Send Update:':'Click a register to select it, enter a value, then Send Update:';
-  else hint.textContent=isCoil?'Click coils to select (multiple), set ON/OFF, then Send Update:':'Click registers to select (multiple), enter values, then Send Update:';
-  entries.sort(function(a,b){return a.address-b.address}).forEach(function(e,idx){
-    var div=document.createElement('div');div.className='wp-item';div.dataset.idx=idx;
-    var tl=e.dataType&&e.dataType!=='default'&&DATA_TYPES[e.dataType]?DATA_TYPES[e.dataType].label:(isCoil?'Coil':'UINT16');
-    var valHtml;
-    if(isCoil){
-      valHtml='<div class="wp-val"><select data-wpval="'+idx+'"><option value="0">OFF (0)</option><option value="1">ON (1)</option></select></div>';
-    }else{
-      valHtml='<div class="wp-val"><input type="text" data-wpval="'+idx+'" placeholder="Value" onclick="event.stopPropagation()"></div>';
-    }
-    div.innerHTML='<span class="wp-addr">'+e.address+'</span><span class="wp-label">'+esc(e.label||'\u2014')+'</span><span class="wp-type">'+tl+'</span>'+valHtml;
-    if(isSingle){
-      div.onclick=function(ev){
-        if(ev.target.tagName==='INPUT'||ev.target.tagName==='SELECT')return;
-        document.querySelectorAll('#writePicker .wp-item').forEach(function(d){d.classList.remove('selected')});
-        div.classList.add('selected');
-        $('startAddr').value=e.address;$('quantity').value=1;updateOffsetUI();
-        if(isCoil){var sel=div.querySelector('select');$('writeValue').value=sel?sel.value:'0'}
-        else{var inp=div.querySelector('input');$('writeValue').value=inp?inp.value:'0'}
-      };
-    }else{
-      div.onclick=function(ev){
-        if(ev.target.tagName==='INPUT'||ev.target.tagName==='SELECT')return;
-        div.classList.toggle('selected');updateMultiWriteFromPicker(fc);
-      };
-    }
-    picker.appendChild(div);writePickerEntries.push(e);
-  });
-  // Auto-select first for single writes
-  if(isSingle&&picker.firstChild){
-    picker.firstChild.classList.add('selected');
-    $('startAddr').value=entries[0].address;$('quantity').value=1;updateOffsetUI();
-  }
-  // Value change listeners for single coil
-  if(fc===5){picker.querySelectorAll('select[data-wpval]').forEach(function(sel){
-    sel.addEventListener('change',function(){var item=this.closest('.wp-item');if(item&&item.classList.contains('selected'))$('writeValue').value=this.value})
-  })}
-  // Value change listeners for single register
-  if(fc===6){picker.querySelectorAll('input[data-wpval]').forEach(function(inp){
-    inp.addEventListener('input',function(){var item=this.closest('.wp-item');if(item&&item.classList.contains('selected'))$('writeValue').value=this.value})
-  })}
-  // Value change listeners for multi writes
-  if(fc===15||fc===16){picker.querySelectorAll('[data-wpval]').forEach(function(el){
-    el.addEventListener('change',function(){updateMultiWriteFromPicker(fc)});
-    el.addEventListener('input',function(){updateMultiWriteFromPicker(fc)})
-  })}
-}
-
-function updateMultiWriteFromPicker(fc){
-  var items=document.querySelectorAll('#writePicker .wp-item.selected');
-  if(!items.length){$('writeValue').value='';pendingMultiWrites=null;return}
-  var selected=[];
-  items.forEach(function(item){
-    var idx=+item.dataset.idx;var e=writePickerEntries[idx];
-    var valEl=item.querySelector('[data-wpval]');
-    selected.push({address:e.address,val:valEl?valEl.value:'0',label:e.label||''});
-  });
-  selected.sort(function(a,b){return a.address-b.address});
-  // Check if contiguous
-  var contiguous=true;
-  for(var i=1;i<selected.length;i++){
-    if(selected[i].address!==selected[i-1].address+1){contiguous=false;break}
-  }
-  if(selected.length===1){
-    $('startAddr').value=selected[0].address;$('quantity').value=1;
-    $('writeValue').value=selected[0].val;
-    pendingMultiWrites=null;
-  }else if(contiguous){
-    // Contiguous block: use normal multi-write
-    $('startAddr').value=selected[0].address;
-    $('quantity').value=selected.length;
-    $('writeValue').value=selected.map(function(s){return s.val||'0'}).join(', ');
-    pendingMultiWrites=null;
-  }else{
-    // Non-contiguous: store for individual writes in sendQuery
-    $('startAddr').value=selected[0].address;
-    $('quantity').value=selected.length;
-    $('writeValue').value=selected.map(function(s){return s.val||'0'}).join(', ');
-    pendingMultiWrites=selected;
-  }
-  updateOffsetUI();
-}
-// Holds non-contiguous multi-write items; sendQuery uses individual writes if set
-var pendingMultiWrites=null;
-
-// ─── FC ──────────────────────────────────────────────
-function setFC(fc,el){
-  currentFC=fc;pendingMultiWrites=null;
-  resetResponseArea();
-  document.querySelectorAll('.fc-tab').forEach(function(t){t.classList.remove('active')});
-  el.classList.add('active');
-  $('fcName').textContent=fcNames[fc];
-  var b=$('fcBadge');b.textContent='FC '+String(fc).padStart(2,'0');
-  b.className=writeFCs.includes(fc)?'fc-badge write':'fc-badge';
-  // Stop polling when switching to a write FC
-  if(writeFCs.includes(fc)&&isPolling)stopPolling();
-  var wg=$('writeGroup'),wl=$('writeLabel'),wh=$('writeHint'),wv=$('writeValue');
-  var mw=$('writeManualWrap'),pw=$('writePickerWrap');
-  if(writeFCs.includes(fc)){
-    wg.style.display='block';
-    // Set manual input hints per FC
-    if(fc===5){wl.textContent='Coil Value';wv.placeholder='1 or 0';wh.textContent='1/true/on for ON, 0/false/off for OFF.'}
-    else if(fc===6){wl.textContent='Register Value (0-65535)';wv.placeholder='e.g. 1234';wh.textContent='Single 16-bit unsigned integer.'}
-    else if(fc===15){wl.textContent='Coil Values';wv.placeholder='1,0,1,1,0,1';wh.textContent='Comma/space separated 1/0.'}
-    else if(fc===16){wl.textContent='Register Values';wv.placeholder='100,200,300';wh.textContent='Comma/space separated integers.'}
-    // Default: show manual input, hide picker. applyProfileToFC overrides if profile is active.
-    mw.style.display='block';pw.style.display='none';
-  }else{
-    wg.style.display='none';
-  }
-  // Update send button label
-  $('sendBtnText').textContent=writeFCs.includes(fc)?'Send Update':'Send Query';
-  applyProfileToFC(fc);
-}
-
-// ─── Polling ─────────────────────────────────────────
-function togglePolling(){const cb=$('pollingEnabled');if(cb.checked){if(!connected){addLog('err','Connect first.');cb.checked=false;return}const iv=+$('pollInterval').value||1000;isPolling=true;addLog('tx','Polling every '+iv+'ms');sendQuery();pollingTimer=setInterval(sendQuery,iv)}else stopPolling()}
-function stopPolling(){if(pollingTimer){clearInterval(pollingTimer);pollingTimer=null}isPolling=false;$('pollingEnabled').checked=false;addLog('tx','Polling stopped')}
-
-// ─── Log ─────────────────────────────────────────────
-function addLog(dir,msg){logEntries++;$('logCount').textContent=logEntries;const lb=$('logBody'),now=new Date(),t=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0')+'.'+String(now.getMilliseconds()).padStart(3,'0'),dl=dir==='tx'?'TX':dir==='rx'?'RX':'!!',e=document.createElement('div');e.className='log-entry fade-in';e.innerHTML='<span class="log-time">'+t+'</span><span class="log-dir '+dir+'">'+dl+'</span><span class="log-msg">'+msg+'</span>';lb.appendChild(e);lb.scrollTop=lb.scrollHeight}
-function clearLog(){$('logBody').innerHTML='';logEntries=0;$('logCount').textContent='0'}
-
-// ─── Helpers ─────────────────────────────────────────
-function hex(a){return Array.from(a).map(b=>b.toString(16).toUpperCase().padStart(2,'0')).join(' ')}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-</script>
+<script src="modbus-master.js"></script>
 </body>
 </html>
